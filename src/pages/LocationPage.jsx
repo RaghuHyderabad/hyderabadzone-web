@@ -21,7 +21,7 @@ export default function LocationPage() {
   })
 
   if (isLoading) return (
-    <div className="flex justify-center py-24">
+    <div className="flex justify-center py-24" style={{minHeight:"60vh"}}>
       <Loader2 className="w-8 h-8 text-brand animate-spin" />
     </div>
   )
@@ -45,7 +45,7 @@ export default function LocationPage() {
   } : null
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8" style={{minHeight:"100vh"}}>
       {loc && (
         <SEO
           title={`${loc.name} Properties for Sale | Plots, Villas & Flats`}
