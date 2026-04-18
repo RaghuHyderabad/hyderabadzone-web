@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowRight, TrendingUp, MapPin, Shield, Zap, Phone } from 'lucide-react'
 import SearchBar from '../components/search/SearchBar'
@@ -23,6 +24,7 @@ const BUDGET_CHIPS = [
 
 export default function Home() {
   const navigate = useNavigate()
+  const [visibleRows, setVisibleRows] = useState(4)
 
   const { data: featured } = useQuery({
     queryKey: ['featured-properties'],
@@ -165,20 +167,46 @@ export default function Home() {
                 <p className="section-sub">High appreciation potential areas</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {emergingLocations.data.map(l => (
-                <Link
-                  key={l.id}
-                  to={`/${l.slug}`}
-                  className="card p-4 text-center hover:border-orange-200 hover:shadow-md transition group">
-                  <MapPin className="w-5 h-5 text-cta-start mx-auto mb-2 group-hover:scale-110 transition" />
-                  <div className="font-medium text-sm text-gray-800">{l.name}</div>
-                  {l.active_count > 0 && (
-                    <div className="text-xs text-gray-400 mt-1">{l.active_count} listings</div>
-                  )}
-                </Link>
-              ))}
-            </div>
+            {(() => {
+              const COLS = 6
+              const visibleCount = visibleRows * COLS
+              const visible = emergingLocations.data.slice(0, visibleCount)
+              const hasMore = emergingLocations.data.length > visibleCount
+              return (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    {visible.map(l => (
+                      <Link
+                        key={l.id}
+                        to={`/${l.slug}`}
+                        className="card p-4 text-center hover:border-orange-200 hover:shadow-md transition group">
+                        <MapPin className="w-5 h-5 text-cta-start mx-auto mb-2 group-hover:scale-110 transition" />
+                        <div className="font-medium text-sm text-gray-800">{l.name}</div>
+                        {l.active_count > 0 && (
+                          <div className="text-xs text-gray-400 mt-1">{l.active_count} listings</div>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="text-center mt-6 flex gap-3 justify-center">
+                    {hasMore && (
+                      <button
+                        onClick={() => setVisibleRows(r => r + 4)}
+                        className="btn-outline flex items-center gap-2 px-6">
+                        View More <ArrowRight className="w-4 h-4" />
+                      </button>
+                    )}
+                    {visibleRows > 4 && (
+                      <button
+                        onClick={() => setVisibleRows(4)}
+                        className="text-sm text-gray-400 hover:text-brand transition px-4 py-2">
+                        Show Less
+                      </button>
+                    )}
+                  </div>
+                </>
+              )
+            })()}
           </div>
         </section>
       )}
