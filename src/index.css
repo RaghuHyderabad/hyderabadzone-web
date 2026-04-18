@@ -58,3 +58,36 @@
     @apply text-gray-500 mt-1;
   }
 }
+
+
+/* ── CLS Fixes ─────────────────────────────────────── */
+/* Prevent layout shift from images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Prevent layout shift from fonts */
+* {
+  font-display: swap;
+}
+
+/* Reserve space for dynamic content */
+.card {
+  contain: layout style;
+}
+
+/* Prevent aspect ratio shifts */
+.aspect-video {
+  aspect-ratio: 16 / 9;
+}
+
+.aspect-\[4\/3\] {
+  aspect-ratio: 4 / 3;
+}
+
+/* Smooth content loading */
+[data-loading] {
+  min-height: 200px;
+}
