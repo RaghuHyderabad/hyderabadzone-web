@@ -42,7 +42,7 @@ export default function Search() {
   })
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8" style={{minHeight:"80vh"}}>
       {/* Search bar */}
       <div className="mb-6 max-w-2xl">
         <SearchBar defaultValue={q} />
@@ -114,7 +114,7 @@ export default function Search() {
 
       {/* Grid */}
       {isLoading ? (
-        <div className="flex justify-center py-16">
+        <div className="flex justify-center py-16" style={{minHeight:"40vh"}}>
           <Loader2 className="w-8 h-8 text-brand animate-spin" />
         </div>
       ) : data?.data?.length === 0 ? (
