@@ -33,7 +33,7 @@ export default function PropertyDetail() {
   })
 
   if (isLoading) return (
-    <div className="flex justify-center py-24">
+    <div className="flex justify-center py-24" style={{minHeight:"60vh"}}>
       <Loader2 className="w-8 h-8 text-brand animate-spin" />
     </div>
   )
@@ -87,12 +87,12 @@ export default function PropertyDetail() {
           { name: p.title, url: `/property/${p.slug}` },
         ]}
       />
-    <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8" style={{minHeight:"100vh"}}>
       {/* ── Left: Images + Details ── */}
       <div className="lg:col-span-2 space-y-6">
         {/* Image gallery */}
         <div className="card overflow-hidden">
-          <div className="aspect-video bg-gray-100 relative">
+          <div className="aspect-video bg-gray-100 relative" style={{aspectRatio:"16/9"}}>
             {p.images?.length > 0 ? (
               <img src={p.images[activeImg]?.url} alt={p.title}
                 className="w-full h-full object-cover" />
