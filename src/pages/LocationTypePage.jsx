@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { MapPin, TrendingUp, Loader2, ArrowRight } from 'lucide-react'
 import { propertiesApi, locationsApi } from '../api/index'
 import PropertyCard from '../components/ui/PropertyCard'
+import SEO from '../components/SEO'
 
 const TYPE_MAP = {
   'plots':               'plot',
@@ -49,6 +50,16 @@ export default function LocationTypePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      <SEO
+        title={`${typeLabel} in ${loc?.name ?? locationSlug} Hyderabad for Sale | Prices`}
+        description={`Discover ${typeLabel.toLowerCase()} in ${loc?.name ?? locationSlug}, Hyderabad. Compare prices and investment opportunities. Direct owner contact, zero brokerage.`}
+        canonical={`/${locationSlug}/${propertyType}`}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: loc?.name ?? locationSlug, url: `/${locationSlug}` },
+          { name: typeLabel, url: `/${locationSlug}/${propertyType}` },
+        ]}
+      />
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
         <Link to="/" className="hover:text-brand">Home</Link>
