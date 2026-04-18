@@ -9,15 +9,20 @@ import { formatPrice, formatUnitPrice, calcEMI, formatEMI, waLink } from '../uti
 import toast from 'react-hot-toast'
 
 export default function PropertyDetail() {
-  const { slug } = useParams()
+  const { slugId } = useParams()
   const [activeImg, setActiveImg] = useState(0)
   const [leadForm, setLeadForm]   = useState({ name: '', phone: '', message: '' })
   const [emiRate, setEmiRate]     = useState(8.5)
   const [emiTenure, setEmiTenure] = useState(20)
 
+  // Extract ID from end of slug: "2bhk-flat-lb-nagar-1025" → 1025
+  const parts = slugId?.split('-') ?? []
+  const lastPart = parts[parts.length - 1]
+  const propertyId = /^\d+$/.test(lastPart) ? lastPart : slugId
+
   const { data, isLoading } = useQuery({
-    queryKey: ['property', slug],
-    queryFn:  () => propertiesApi.get(slug),
+    queryKey: ['property', propertyId],
+    queryFn:  () => propertiesApi.get(propertyId),
   })
 
   const leadMutation = useMutation({
