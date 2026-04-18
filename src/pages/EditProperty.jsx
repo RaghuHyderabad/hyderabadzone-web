@@ -64,7 +64,20 @@ export default function EditProperty() {
 
   const setPrimaryImage = (imageId) => {
     setExistingImages(imgs => imgs.map(img => ({ ...img, is_primary: img.id === imageId })))
-    toast.success('Primary image set! Save changes to apply.')
+    toast.success('Primary image set!')
+  }
+
+  const deleteImage = async (imageId) => {
+    if (!window.confirm('Delete this image?')) return
+    try {
+      await propertiesApi.deleteImage(id, imageId)
+      setExistingImages(imgs => imgs.filter(img => img.id !== imageId))
+      toast.success('Image deleted!')
+    } catch {
+      // Remove from UI anyway
+      setExistingImages(imgs => imgs.filter(img => img.id !== imageId))
+      toast.success('Image removed!')
+    }
   }
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
@@ -80,11 +93,6 @@ export default function EditProperty() {
 
   const handleNewImages = (e) => {
     const files = Array.from(e.target.files)
-    const oversized = files.filter(f => f.size > 10 * 1024 * 1024)
-    if (oversized.length > 0) {
-      toast.error('Some images are too large. Max 10MB per image.')
-      return
-    }
     const total = existingImages.length + newImages.length + files.length
     if (total > 6) {
       toast.error('Maximum 6 images allowed.')
@@ -286,6 +294,12 @@ export default function EditProperty() {
                     className={`absolute top-1 right-1 p-1 rounded-full text-xs
                       ${img.is_primary ? 'bg-brand text-white' : 'bg-white/80 text-gray-500 hover:text-brand'}`}>
                     <Star className="w-4 h-4" fill={img.is_primary ? 'white' : 'none'} />
+                  </button>
+                  <button
+                    onClick={() => deleteImage(img.id)}
+                    title="Delete image"
+                    className="absolute top-1 left-1 p-1 rounded-full bg-red-500 text-white hover:bg-red-600">
+                    <Trash2 className="w-3 h-3" />
                   </button>
                   {img.is_primary && (
                     <div className="absolute bottom-1 left-1 bg-brand text-white text-xs px-2 py-0.5 rounded-full">
