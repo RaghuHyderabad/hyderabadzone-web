@@ -34,7 +34,13 @@ export default function ListProperty() {
           await propertiesApi.uploadImages(res.property.id, images)
         } catch { toast.error('Image upload failed. You can add them later.') }
       }
-      navigate(`/payment/${res.property.id}`)
+      // Admin listings skip payment
+      if (res.admin) {
+        toast.success('Listing published successfully!')
+        navigate('/dashboard')
+      } else {
+        navigate(`/payment/${res.property.id}`)
+      }
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Failed to create listing.'),
   })
