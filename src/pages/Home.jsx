@@ -157,7 +157,7 @@ export default function Home() {
               {emergingLocations.data.map(l => (
                 <Link
                   key={l.id}
-                  to={`/search?location_slug=${l.slug}`}
+                  to={`/${l.slug}`}
                   className="card p-4 text-center hover:border-orange-200 hover:shadow-md transition group"
                 >
                   <MapPin className="w-5 h-5 text-cta-start mx-auto mb-2 group-hover:scale-110 transition" />
