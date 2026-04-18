@@ -80,6 +80,11 @@ export default function EditProperty() {
 
   const handleNewImages = (e) => {
     const files = Array.from(e.target.files)
+    const oversized = files.filter(f => f.size > 10 * 1024 * 1024)
+    if (oversized.length > 0) {
+      toast.error('Some images are too large. Max 10MB per image.')
+      return
+    }
     const total = existingImages.length + newImages.length + files.length
     if (total > 6) {
       toast.error('Maximum 6 images allowed.')
