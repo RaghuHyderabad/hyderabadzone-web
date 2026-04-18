@@ -34,7 +34,7 @@ export default function PropertyCard({ property, compact = false }) {
   }
 
   return (
-    <Link to={`/property/${property.slug}`} className="card block group">
+    <Link to={`/property/${property.slug}-${property.id}`} className="card block group">
       {/* Image */}
       <div className="relative overflow-hidden rounded-t-card aspect-[4/3] bg-gray-100">
         {property.thumbnail ? (
