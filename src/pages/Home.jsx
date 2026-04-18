@@ -29,6 +29,11 @@ export default function Home() {
     queryFn: propertiesApi.featured,
   })
 
+  const { data: recent } = useQuery({
+    queryKey: ['recent-properties'],
+    queryFn: () => propertiesApi.list({ per_page: 12, sort: 'newest' }),
+  })
+
   const { data: emergingLocations } = useQuery({
     queryKey: ['featured-locations'],
     queryFn: locationsApi.featured,
@@ -112,7 +117,25 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {featured.data.map(p => <PropertyCard key={p.id} property={p} />)}
+            {featured.data.slice(0, 6).map(p => <PropertyCard key={p.id} property={p} />)}
+          </div>
+        </section>
+      )}
+
+      {/* ─── RECENT LISTINGS ─── */}
+      {recent?.data?.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 pb-12">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="section-title">Recent Properties</h2>
+              <p className="section-sub">Latest listings across Hyderabad</p>
+            </div>
+            <Link to="/search?sort=newest" className="btn-outline text-sm flex items-center gap-1">
+              View All <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {recent.data.slice(0, 12).map(p => <PropertyCard key={p.id} property={p} />)}
           </div>
         </section>
       )}
