@@ -217,17 +217,36 @@ export default function ListProperty() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Photos (max 10)</label>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Photos — up to 6 (first one = primary display image)</label>
               <label className="border-2 border-dashed border-gray-200 rounded-xl p-6 flex flex-col items-center
                                justify-center cursor-pointer hover:border-brand transition">
                 <Upload className="w-8 h-8 text-gray-300 mb-2" />
                 <span className="text-sm text-gray-500">Click to upload photos</span>
-                <span className="text-xs text-gray-400 mt-1">JPG, PNG, WebP · Max 5MB each</span>
+                <span className="text-xs text-gray-400 mt-1">JPG, PNG, WebP · Max 5MB · Up to 6 photos</span>
                 <input type="file" multiple accept="image/*" className="hidden"
-                  onChange={e => setImages(Array.from(e.target.files))} />
+                  onChange={e => setImages(Array.from(e.target.files).slice(0, 6))} />
               </label>
               {images.length > 0 && (
-                <p className="text-sm text-green-600 mt-2">{images.length} photo(s) selected</p>
+                <div className="mt-3">
+                  <p className="text-sm text-green-600 mb-2">{images.length} photo(s) selected</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {images.map((img, i) => (
+                      <div key={i} className={`relative rounded-xl overflow-hidden border-2
+                        ${i === 0 ? 'border-brand' : 'border-gray-200'}`}>
+                        <img src={URL.createObjectURL(img)} alt="" className="w-full h-24 object-cover" />
+                        {i === 0 && (
+                          <div className="absolute bottom-1 left-1 bg-brand text-white text-xs px-2 py-0.5 rounded-full">
+                            Primary
+                          </div>
+                        )}
+                        <button type="button" onClick={() => setImages(prev => prev.filter((_, j) => j !== i))}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
 
