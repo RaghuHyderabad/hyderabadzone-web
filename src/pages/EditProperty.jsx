@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { propertiesApi, locationsApi } from '../api/index'
 import { Loader2, Upload, Star, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -60,24 +60,7 @@ export default function EditProperty() {
     }
   }, [propData])
 
-  const updateMutation = useMutation({
-    mutationFn: (data) => propertiesApi.update(id, data),
-    onSuccess: async () => {
-      // Upload new images if any
-      if (newImages.length > 0) {
-        try {
-  await propertiesApi.uploadImages(id, newImages)
-  toast.success('Images uploaded!')
-} catch (e) {
-  console.log('Image upload response:', e)
-  // Images may have uploaded successfully despite error
-}
-      }
-      toast.success('Property updated successfully!')
-      navigate('/dashboard')
-    },
-    onError: (err) => toast.error(err.response?.data?.message || 'Update failed.'),
-  })
+  const [saving, setSaving] = useState(false)
 
   const setPrimaryImage = (imageId) => {
     setExistingImages(imgs => imgs.map(img => ({ ...img, is_primary: img.id === imageId })))
@@ -109,12 +92,33 @@ export default function EditProperty() {
     setNewImages(prev => prev.filter((_, i) => i !== index))
   }
 
-  const submit = () => {
+  const submit = async () => {
     if (!form.title || !form.price) {
       toast.error('Please fill all required fields.')
       return
     }
-    updateMutation.mutate(form)
+    setSaving(true)
+    try {
+      // Step 1: Update property details
+      await propertiesApi.update(id, form)
+      toast.success('Property details updated!')
+
+      // Step 2: Upload new images if any
+      if (newImages.length > 0) {
+        try {
+          await propertiesApi.uploadImages(id, newImages)
+          toast.success(newImages.length + ' image(s) uploaded!')
+        } catch (e) {
+          console.error('Image upload error:', e)
+          toast.error('Details saved but images failed. Try again.')
+        }
+      }
+      navigate('/dashboard')
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Update failed.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (isLoading || !form) return (
@@ -326,9 +330,9 @@ export default function EditProperty() {
         {/* Buttons */}
         <div className="flex gap-3 pt-2">
           <button onClick={() => navigate('/dashboard')} className="btn-outline flex-1">← Cancel</button>
-          <button onClick={submit} disabled={updateMutation.isPending}
+          <button onClick={submit} disabled={saving}
             className="btn-brand flex-1 flex items-center justify-center gap-2">
-            {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             Save Changes
           </button>
         </div>
