@@ -8,7 +8,6 @@ import SearchBar from '../components/search/SearchBar'
 
 export default function LocationPage() {
   const { locationSlug, type } = useParams()
-  // URL pattern: /kondapur-flats → slug=kondapur, type=flats
   const slug = locationSlug || ''
 
   const { data, isLoading } = useQuery({
@@ -22,7 +21,6 @@ export default function LocationPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Header */}
       {loc && (
         <div className="mb-8">
           <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">

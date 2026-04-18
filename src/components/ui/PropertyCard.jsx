@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { MapPin, Eye, Heart, BadgeCheck, Zap, BedDouble, Maximize2 } from 'lucide-react'
 import { formatPrice, formatUnitPrice, priceLabel, calcEMI, formatEMI } from '../../utils/index'
 import { useState } from 'react'
-import { usersApi } from '../../api/index'
+import { userApi } from '../../api/index'
 import useAuthStore from '../../store/authStore'
 import toast from 'react-hot-toast'
 
@@ -23,7 +23,7 @@ export default function PropertyCard({ property, compact = false }) {
     if (!token) { toast.error('Login to save properties.'); return }
     setSaving(true)
     try {
-      const res = await usersApi.toggleSave(property.id)
+      const res = await userApi.toggleSave(property.id)
       setSaved(res.saved)
       toast.success(res.message)
     } catch {
