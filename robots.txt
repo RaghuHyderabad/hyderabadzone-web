@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+Disallow: /search
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /payment
+Disallow: /login
+Disallow: /edit-property
+
+Sitemap: https://www.hyderabadzone.com/sitemap.xml
