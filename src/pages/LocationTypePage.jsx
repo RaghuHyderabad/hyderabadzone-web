@@ -49,7 +49,7 @@ export default function LocationTypePage() {
   const typeLabel = TYPE_LABELS[propertyType]
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8" style={{minHeight:"100vh"}}>
       <SEO
         title={`${typeLabel} in ${loc?.name ?? locationSlug} Hyderabad for Sale | Prices`}
         description={`Discover ${typeLabel.toLowerCase()} in ${loc?.name ?? locationSlug}, Hyderabad. Compare prices and investment opportunities. Direct owner contact, zero brokerage.`}
@@ -106,7 +106,7 @@ export default function LocationTypePage() {
 
       {/* Properties Grid */}
       {propsLoading ? (
-        <div className="flex justify-center py-16">
+        <div className="flex justify-center py-16" style={{minHeight:"40vh"}}>
           <Loader2 className="w-8 h-8 text-brand animate-spin" />
         </div>
       ) : properties.length === 0 ? (
