@@ -22,7 +22,7 @@ export default function ListProperty() {
 
   const { data: locations } = useQuery({
     queryKey: ['locations'],
-    queryFn:  locationsApi.all,
+    queryFn:  locationsApi.list,
   })
 
   const createMutation = useMutation({
@@ -184,7 +184,7 @@ export default function ListProperty() {
                 <label className="text-sm font-medium text-gray-700 mb-1 block">Facing</label>
                 <select value={form.facing} onChange={e => set('facing', e.target.value)} className="input-field">
                   <option value="">Select</option>
-                  {FACINGS.map(f => <option key={f}>{f}</option>)}
+                  {FACING.map(f => <option key={f}>{f}</option>)}
                 </select>
               </div>
             </div>
