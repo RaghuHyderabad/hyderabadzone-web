@@ -77,6 +77,7 @@ export default function Dashboard() {
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
                         <Link to={`/property/${l.slug}`} className="text-brand text-xs hover:underline">View</Link>
+                        <Link to={`/edit-property/${l.id}`} className="text-gray-500 text-xs hover:underline">Edit</Link>
                         {(l.status === 'expired' || l.status === 'active') && (
                           <Link to={`/payment/${l.id}`} className="text-orange-500 text-xs hover:underline">Renew</Link>
                         )}
