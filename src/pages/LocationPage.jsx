@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams, Link } from 'react-router-dom'
 import { MapPin, TrendingUp, Loader2 } from 'lucide-react'
 import { locationsApi } from '../api/index'
+import SEO from '../components/SEO'
 import PropertyCard from '../components/ui/PropertyCard'
 
 const TYPES = [
@@ -36,8 +37,24 @@ export default function LocationPage() {
 
   const loc = data.location
 
+  const schema = loc ? {
+    '@context': 'https://schema.org',
+    '@type': 'Place',
+    name: loc.name + ', Hyderabad',
+    address: { '@type': 'PostalAddress', addressLocality: loc.name, addressRegion: 'Telangana', addressCountry: 'IN' },
+  } : null
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      {loc && (
+        <SEO
+          title={`${loc.name} Properties for Sale | Plots, Villas & Flats`}
+          description={`Explore properties in ${loc.name}, Hyderabad. Find plots, villas, and flats with latest prices. Direct owner contact, zero brokerage.`}
+          canonical={`/${locationSlug}`}
+          schema={schema}
+          breadcrumbs={[{ name: 'Home', url: '/' }, { name: loc.name, url: `/${locationSlug}` }]}
+        />
+      )}
       <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
         <Link to="/" className="hover:text-brand">Home</Link>
         <span>/</span>
