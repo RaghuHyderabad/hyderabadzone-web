@@ -4,18 +4,18 @@ import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import useAuthStore from './store/authStore'
 
-// Lazy load pages for performance
-const Home           = lazy(() => import('./pages/Home'))
-const Search         = lazy(() => import('./pages/Search'))
-const PropertyDetail = lazy(() => import('./pages/PropertyDetail'))
-const ListProperty   = lazy(() => import('./pages/ListProperty'))
-const Payment        = lazy(() => import('./pages/Payment'))
-const Dashboard      = lazy(() => import('./pages/Dashboard'))
-const LocationPage   = lazy(() => import('./pages/LocationPage'))
-const Login          = lazy(() => import('./pages/Login'))
-const AdminDashboard = lazy(() => import('./pages/Admin/AdminDashboard'))
-const ManageListings = lazy(() => import('./pages/Admin/ManageListings'))
-const Analytics      = lazy(() => import('./pages/Admin/Analytics'))
+const Home             = lazy(() => import('./pages/Home'))
+const Search           = lazy(() => import('./pages/Search'))
+const PropertyDetail   = lazy(() => import('./pages/PropertyDetail'))
+const ListProperty     = lazy(() => import('./pages/ListProperty'))
+const Payment          = lazy(() => import('./pages/Payment'))
+const Dashboard        = lazy(() => import('./pages/Dashboard'))
+const Login            = lazy(() => import('./pages/Login'))
+const LocationPage     = lazy(() => import('./pages/LocationPage'))
+const LocationTypePage = lazy(() => import('./pages/LocationTypePage'))
+const AdminDashboard   = lazy(() => import('./pages/Admin/AdminDashboard'))
+const ManageListings   = lazy(() => import('./pages/Admin/ManageListings'))
+const Analytics        = lazy(() => import('./pages/Admin/Analytics'))
 
 function ProtectedRoute({ children }) {
   const { token } = useAuthStore()
@@ -44,24 +44,19 @@ export default function App() {
       <main className="flex-1">
         <Suspense fallback={<PageLoader />}>
           <Routes>
-            {/* Public */}
-            <Route path="/"                         element={<Home />} />
-            <Route path="/login"                    element={<Login />} />
-            <Route path="/search"                   element={<Search />} />
-            <Route path="/property/:slugId"          element={<PropertyDetail />} />
-            <Route path="/:locationSlug-:type"      element={<LocationPage />} />
-
-            {/* Protected */}
-            <Route path="/list-property"  element={<ProtectedRoute><ListProperty /></ProtectedRoute>} />
-            <Route path="/payment/:id"    element={<ProtectedRoute><Payment /></ProtectedRoute>} />
-            <Route path="/dashboard"      element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-
-            {/* Admin */}
-            <Route path="/admin"                element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-            <Route path="/admin/listings"       element={<AdminRoute><ManageListings /></AdminRoute>} />
-            <Route path="/admin/analytics"      element={<AdminRoute><Analytics /></AdminRoute>} />
-
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/"                      element={<Home />} />
+            <Route path="/login"                 element={<Login />} />
+            <Route path="/search"                element={<Search />} />
+            <Route path="/property/:slugId"      element={<PropertyDetail />} />
+            <Route path="/list-property"         element={<ProtectedRoute><ListProperty /></ProtectedRoute>} />
+            <Route path="/payment/:id"           element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+            <Route path="/dashboard"             element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/admin"                 element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+            <Route path="/admin/listings"        element={<AdminRoute><ManageListings /></AdminRoute>} />
+            <Route path="/admin/analytics"       element={<AdminRoute><Analytics /></AdminRoute>} />
+            <Route path="/:locationSlug"         element={<LocationPage />} />
+            <Route path="/:locationSlug/:propertyType" element={<LocationTypePage />} />
+            <Route path="*"                      element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </main>
