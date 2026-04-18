@@ -36,10 +36,15 @@ export default function Home() {
     queryFn: () => propertiesApi.list({ per_page: 12, sort: 'newest' }),
   })
 
-  const { data: emergingLocations } = useQuery({
-    queryKey: ['featured-locations'],
-    queryFn: locationsApi.featured,
+  const { data: allLocations } = useQuery({
+    queryKey: ['all-locations'],
+    queryFn: locationsApi.list,
   })
+
+  // Flatten all locations from all zones into one array
+  const allLocationsList = allLocations?.data
+    ? Object.values(allLocations.data).flat()
+    : []
 
   const handleBudget = ({ min, max }) => {
     const params = new URLSearchParams()
@@ -155,23 +160,23 @@ export default function Home() {
       )}
 
       {/* ─── EMERGING ZONES ─── */}
-      {emergingLocations?.data?.length > 0 && (
+      {allLocationsList.length > 0 && (
         <section className="bg-gradient-to-br from-orange-50 to-amber-50 py-12 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="section-title flex items-center gap-2">
                   <TrendingUp className="w-6 h-6 text-cta-start" />
-                  Emerging Growth Zones
+                  Explore All Locations
                 </h2>
-                <p className="section-sub">High appreciation potential areas</p>
+                <p className="section-sub">Browse properties across 128+ Hyderabad areas</p>
               </div>
             </div>
             {(() => {
               const COLS = 6
               const visibleCount = visibleRows * COLS
-              const visible = emergingLocations.data.slice(0, visibleCount)
-              const hasMore = emergingLocations.data.length > visibleCount
+              const visible = allLocationsList.slice(0, visibleCount)
+              const hasMore = allLocationsList.length > visibleCount
               return (
                 <>
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
