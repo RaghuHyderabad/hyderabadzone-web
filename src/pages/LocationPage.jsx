@@ -63,21 +63,3 @@ export default function LocationPage() {
     </div>
   )
 }
-
-
-// ═══════════════════════════════════════════════════
-// Re-exports for lazy-loaded routes in App.jsx
-// Each page needs its own default export file
-// ═══════════════════════════════════════════════════
-
-// src/pages/Search.jsx  → already created above
-// src/pages/Login.jsx
-export { Login as default } from './Pages'
-
-// src/pages/Dashboard.jsx
-// Already exported from DashboardAndList.jsx
-
-// src/pages/ListProperty.jsx  → already in DashboardAndList.jsx
-
-// src/pages/Admin/ManageListings.jsx
-// src/pages/Admin/Analytics.jsx
