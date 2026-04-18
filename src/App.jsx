@@ -8,6 +8,7 @@ const Home             = lazy(() => import('./pages/Home'))
 const Search           = lazy(() => import('./pages/Search'))
 const PropertyDetail   = lazy(() => import('./pages/PropertyDetail'))
 const ListProperty     = lazy(() => import('./pages/ListProperty'))
+const EditProperty     = lazy(() => import('./pages/EditProperty'))
 const Payment          = lazy(() => import('./pages/Payment'))
 const Dashboard        = lazy(() => import('./pages/Dashboard'))
 const Login            = lazy(() => import('./pages/Login'))
@@ -50,7 +51,7 @@ export default function App() {
             <Route path="/search"             element={<Search />} />
             <Route path="/property/:slugId"   element={<PropertyDetail />} />
             <Route path="/list-property"      element={<ProtectedRoute><ListProperty /></ProtectedRoute>} />
-            <Route path="/edit-property/:id"  element={<ProtectedRoute><ListProperty /></ProtectedRoute>} />
+            <Route path="/edit-property/:id"  element={<ProtectedRoute><EditProperty /></ProtectedRoute>} />
             <Route path="/payment/:id"        element={<ProtectedRoute><Payment /></ProtectedRoute>} />
             <Route path="/dashboard"          element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/admin"              element={<AdminRoute><AdminDashboard /></AdminRoute>} />
