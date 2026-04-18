@@ -44,19 +44,24 @@ export default function App() {
       <main className="flex-1">
         <Suspense fallback={<PageLoader />}>
           <Routes>
-            <Route path="/"                      element={<Home />} />
-            <Route path="/login"                 element={<Login />} />
-            <Route path="/search"                element={<Search />} />
-            <Route path="/property/:slugId"      element={<PropertyDetail />} />
-            <Route path="/list-property"         element={<ProtectedRoute><ListProperty /></ProtectedRoute>} />
-            <Route path="/payment/:id"           element={<ProtectedRoute><Payment /></ProtectedRoute>} />
-            <Route path="/dashboard"             element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/admin"                 element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-            <Route path="/admin/listings"        element={<AdminRoute><ManageListings /></AdminRoute>} />
-            <Route path="/admin/analytics"       element={<AdminRoute><Analytics /></AdminRoute>} />
-            <Route path="/:locationSlug"         element={<LocationPage />} />
+            {/* Static routes first - must be before dynamic ones */}
+            <Route path="/"                   element={<Home />} />
+            <Route path="/login"              element={<Login />} />
+            <Route path="/search"             element={<Search />} />
+            <Route path="/property/:slugId"   element={<PropertyDetail />} />
+            <Route path="/list-property"      element={<ProtectedRoute><ListProperty /></ProtectedRoute>} />
+            <Route path="/edit-property/:id"  element={<ProtectedRoute><ListProperty /></ProtectedRoute>} />
+            <Route path="/payment/:id"        element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+            <Route path="/dashboard"          element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/admin"              element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+            <Route path="/admin/listings"     element={<AdminRoute><ManageListings /></AdminRoute>} />
+            <Route path="/admin/analytics"    element={<AdminRoute><Analytics /></AdminRoute>} />
+
+            {/* SEO Location Routes - must be LAST */}
+            <Route path="/:locationSlug"               element={<LocationPage />} />
             <Route path="/:locationSlug/:propertyType" element={<LocationTypePage />} />
-            <Route path="*"                      element={<Navigate to="/" replace />} />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </main>
