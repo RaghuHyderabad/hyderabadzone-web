@@ -79,7 +79,7 @@ export default function PropertyDetail() {
                 <button key={i} onClick={() => setActiveImg(i)}
                   className={`flex-shrink-0 w-16 h-12 rounded-lg overflow-hidden border-2 transition
                     ${i === activeImg ? 'border-brand' : 'border-transparent'}`}>
-                  <img src={img.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                  <img src={img.url} alt="" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
