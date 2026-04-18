@@ -41,6 +41,26 @@ export default function PropertyDetail() {
   const p = data?.data
   if (!p) return <div className="text-center py-16 text-gray-400">Property not found.</div>
 
+  const seoTitle = p.area
+    ? `${p.area}${p.area_unit} ${p.type} in ${p.location?.name} | ${p.formatted_price}`
+    : `${p.type} in ${p.location?.name} | ${p.formatted_price}`
+
+  const propertySchema = {
+    '@context': 'https://schema.org',
+    '@type': 'RealEstateListing',
+    name: p.title,
+    description: p.description || p.title,
+    url: `https://www.hyderabadzone.com/property/${p.slug}`,
+    image: p.thumbnail || '',
+    offers: { '@type': 'Offer', price: p.price, priceCurrency: 'INR' },
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: p.location?.name,
+      addressRegion: 'Telangana',
+      addressCountry: 'IN',
+    },
+  }
+
   const totalPrice = p.price_type === 'total' ? Number(p.price) : Number(p.price) * Number(p.area)
   const emi        = calcEMI(totalPrice, emiRate, emiTenure)
 
