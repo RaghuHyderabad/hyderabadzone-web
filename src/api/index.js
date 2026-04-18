@@ -44,6 +44,8 @@ export const paymentsApi = {
 }
 
 export const userApi = {
+  dashboard:  ()     => client.get('/api/users/dashboard').then(r => r.data),
+  submitLead: (data) => client.post('/api/leads', data).then(r => r.data),
   profile:    ()     => client.get('/api/user/profile').then(r => r.data),
   update:     (data) => client.put('/api/user/profile', data).then(r => r.data),
   myListings: ()     => client.get('/api/user/listings').then(r => r.data),
