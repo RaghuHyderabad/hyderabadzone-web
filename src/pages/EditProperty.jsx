@@ -91,32 +91,39 @@ export default function EditProperty() {
     }))
   }
 
+  const MAX_MB = 5
+  const MAX_BYTES = MAX_MB * 1024 * 1024
+
   const handleNewImages = (e) => {
     const files = Array.from(e.target.files)
+    e.target.value = '' // Reset input so same file can be re-selected after fix
 
-    // Check file sizes - max 5MB each
-    const MAX_SIZE = 5 * 1024 * 1024 // 5MB
-    const oversized = files.filter(f => f.size > MAX_SIZE)
-    if (oversized.length > 0) {
-      toast.error(
-        `❌ ${oversized.map(f => f.name).join(', ')} ${oversized.length > 1 ? 'are' : 'is'} too large!\n\nMax size is 5MB per photo.\n\nTip: Compress your image at tinypng.com (free) and try again.`,
-        { duration: 6000 }
-      )
-      return
+    // Check each file size STRICTLY
+    for (const file of files) {
+      const sizeMB = (file.size / 1024 / 1024).toFixed(1)
+      if (file.size > MAX_BYTES) {
+        toast.error(
+          `❌ "${file.name}" is ${sizeMB}MB — too large!\n\nMax allowed: ${MAX_MB}MB per photo.\n\n👉 Compress it free at tinypng.com then upload again.`,
+          { duration: 8000 }
+        )
+        return
+      }
     }
 
     // Check file types
-    const allowed = ['image/jpeg', 'image/png', 'image/webp']
-    const invalid = files.filter(f => !allowed.includes(f.type))
-    if (invalid.length > 0) {
-      toast.error('Only JPG, PNG and WebP images are allowed.')
-      return
+    const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    for (const file of files) {
+      if (!allowed.includes(file.type)) {
+        toast.error(`❌ "${file.name}" is not a valid image type. Only JPG, PNG, WebP allowed.`)
+        return
+      }
     }
 
     // Check total count
     const total = existingImages.length + newImages.length + files.length
     if (total > 6) {
-      toast.error(`You can only have 6 photos total. You already have ${existingImages.length + newImages.length}.`)
+      const remaining = 6 - existingImages.length - newImages.length
+      toast.error(`You can only add ${remaining} more photo(s). Max 6 total.`)
       return
     }
 
@@ -144,8 +151,17 @@ export default function EditProperty() {
           await propertiesApi.uploadImages(id, newImages)
           toast.success(newImages.length + ' image(s) uploaded!')
         } catch (e) {
-          console.error('Image upload error:', e)
-          toast.error('Details saved but images failed. Try again.')
+          const serverMsg = e?.response?.data?.message || ''
+          const errDetail = e?.response?.data?.errors
+            ? Object.values(e.response.data.errors).flat().join(' ')
+            : ''
+          if (serverMsg.includes('kilobytes') || errDetail.includes('kilobytes')) {
+            toast.error('❌ Image too large! Please compress your photos at tinypng.com (free) and try again. Max 10MB per photo.', { duration: 8000 })
+          } else if (serverMsg || errDetail) {
+            toast.error(serverMsg || errDetail)
+          } else {
+            toast.error('Image upload failed. Please try again.')
+          }
         }
       }
       navigate('/dashboard')
