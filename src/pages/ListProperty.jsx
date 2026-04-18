@@ -223,8 +223,21 @@ export default function ListProperty() {
                 <Upload className="w-8 h-8 text-gray-300 mb-2" />
                 <span className="text-sm text-gray-500">Click to upload photos</span>
                 <span className="text-xs text-gray-400 mt-1">JPG, PNG, WebP · Max 5MB · Up to 6 photos</span>
-                <input type="file" multiple accept="image/*" className="hidden"
-                  onChange={e => setImages(Array.from(e.target.files).slice(0, 6))} />
+                <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden"
+                  onChange={e => {
+                    const files = Array.from(e.target.files)
+                    const MAX_SIZE = 5 * 1024 * 1024
+                    const oversized = files.filter(f => f.size > MAX_SIZE)
+                    if (oversized.length > 0) {
+                      toast.error(`❌ Photo too large! Max size is 5MB.\n\nTip: Compress free at tinypng.com`, { duration: 6000 })
+                      return
+                    }
+                    if (files.length > 6) {
+                      toast.error('Maximum 6 photos allowed.')
+                      return
+                    }
+                    setImages(files.slice(0, 6))
+                  }} />
               </label>
               {images.length > 0 && (
                 <div className="mt-3">
