@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams, Link } from 'react-router-dom'
 import { MapPin, TrendingUp, Loader2 } from 'lucide-react'
 import { locationsApi } from '../api/index'
+import PropertyCard from '../components/ui/PropertyCard'
 
 const TYPES = [
   { label: 'Open Plots',         type: 'plots',              icon: '🌿', desc: 'HMDA, DTCP approved plots' },
@@ -78,18 +79,7 @@ export default function LocationPage() {
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-4">All Properties in {loc.name}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {data.properties.data.map(p => (
-              <Link key={p.id} to={`/property/${p.slug}-${p.id}`}
-                className="card overflow-hidden hover:shadow-lg transition">
-                {p.thumbnail && <img src={p.thumbnail} alt={p.title} className="w-full h-40 object-cover" />}
-                <div className="p-4">
-                  <div className="text-xs text-brand font-medium uppercase mb-1">{p.type}</div>
-                  <div className="font-semibold text-gray-900 mb-1 truncate">{p.title}</div>
-                  <div className="text-orange-600 font-bold">{p.formatted_price}</div>
-                  {p.area && <div className="text-xs text-gray-400 mt-1">{p.area} {p.area_unit}</div>}
-                </div>
-              </Link>
-            ))}
+            {data.properties.data.map(p => <PropertyCard key={p.id} property={p} />)}
           </div>
         </div>
       )}
