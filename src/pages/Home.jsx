@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowRight, TrendingUp, MapPin, Shield, Zap, Phone } from 'lucide-react'
 import SearchBar from '../components/search/SearchBar'
+import SEO from '../components/SEO'
 import PropertyCard from '../components/ui/PropertyCard'
 import { propertiesApi, locationsApi } from '../api/index'
 
@@ -45,8 +46,26 @@ export default function Home() {
     navigate(`/search?${params}`)
   }
 
+  const homeSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'HyderabadZone',
+    url: 'https://www.hyderabadzone.com',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: 'https://www.hyderabadzone.com/search?q={search_term_string}',
+      'query-input': 'required name=search_term_string',
+    },
+  }
+
   return (
     <div>
+      <SEO
+        title="Find Plots, Flats & Villas in Hyderabad | Direct Owner"
+        description="HyderabadZone – 120+ locations, verified listings, direct owner contact. Find plots, flats, villas & houses in Hyderabad. Zero brokerage."
+        canonical="/"
+        schema={homeSchema}
+      />
       {/* ─── HERO ─── */}
       <section className="bg-gradient-to-br from-brand to-brand-light py-16 md:py-24 px-4">
         <div className="max-w-4xl mx-auto text-center">
