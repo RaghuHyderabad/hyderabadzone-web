@@ -48,7 +48,7 @@ export default function App() {
             <Route path="/"                         element={<Home />} />
             <Route path="/login"                    element={<Login />} />
             <Route path="/search"                   element={<Search />} />
-            <Route path="/property/:slug"           element={<PropertyDetail />} />
+            <Route path="/property/:slugId"          element={<PropertyDetail />} />
             <Route path="/:locationSlug-:type"      element={<LocationPage />} />
 
             {/* Protected */}
