@@ -226,11 +226,17 @@ export default function ListProperty() {
                 <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden"
                   onChange={e => {
                     const files = Array.from(e.target.files)
-                    const MAX_SIZE = 5 * 1024 * 1024
-                    const oversized = files.filter(f => f.size > MAX_SIZE)
-                    if (oversized.length > 0) {
-                      toast.error(`❌ Photo too large! Max size is 5MB.\n\nTip: Compress free at tinypng.com`, { duration: 6000 })
-                      return
+                    const MAX_BYTES = 5 * 1024 * 1024
+                    e.target.value = ''
+                    for (const file of files) {
+                      const sizeMB = (file.size / 1024 / 1024).toFixed(1)
+                      if (file.size > MAX_BYTES) {
+                        toast.error(
+                          `❌ "${file.name}" is ${sizeMB}MB — too large!\n\nMax allowed: 5MB per photo.\n\n👉 Compress it free at tinypng.com then upload again.`,
+                          { duration: 8000 }
+                        )
+                        return
+                      }
                     }
                     if (files.length > 6) {
                       toast.error('Maximum 6 photos allowed.')
