@@ -7,6 +7,7 @@ export const propertiesApi = {
   create: (data)      => client.post('/api/properties', data).then(r => r.data),
   update: (id, data)  => client.put(`/api/properties/${id}`, data).then(r => r.data),
   delete: (id)        => client.delete(`/api/properties/${id}`).then(r => r.data),
+  deleteImage:   (id, imageId) => client.delete(`/api/properties/${id}/images/${imageId}`).then(r => r.data),
   uploadImages: (id, files) => {
     const form = new FormData()
     files.forEach(f => form.append('images[]', f))
