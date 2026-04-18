@@ -93,11 +93,33 @@ export default function EditProperty() {
 
   const handleNewImages = (e) => {
     const files = Array.from(e.target.files)
-    const total = existingImages.length + newImages.length + files.length
-    if (total > 6) {
-      toast.error('Maximum 6 images allowed.')
+
+    // Check file sizes - max 5MB each
+    const MAX_SIZE = 5 * 1024 * 1024 // 5MB
+    const oversized = files.filter(f => f.size > MAX_SIZE)
+    if (oversized.length > 0) {
+      toast.error(
+        `❌ ${oversized.map(f => f.name).join(', ')} ${oversized.length > 1 ? 'are' : 'is'} too large!\n\nMax size is 5MB per photo.\n\nTip: Compress your image at tinypng.com (free) and try again.`,
+        { duration: 6000 }
+      )
       return
     }
+
+    // Check file types
+    const allowed = ['image/jpeg', 'image/png', 'image/webp']
+    const invalid = files.filter(f => !allowed.includes(f.type))
+    if (invalid.length > 0) {
+      toast.error('Only JPG, PNG and WebP images are allowed.')
+      return
+    }
+
+    // Check total count
+    const total = existingImages.length + newImages.length + files.length
+    if (total > 6) {
+      toast.error(`You can only have 6 photos total. You already have ${existingImages.length + newImages.length}.`)
+      return
+    }
+
     setNewImages(prev => [...prev, ...files].slice(0, 6 - existingImages.length))
   }
 
