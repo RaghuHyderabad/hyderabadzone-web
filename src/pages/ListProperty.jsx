@@ -5,6 +5,10 @@ import { propertiesApi, locationsApi } from '../api/index'
 import { Loader2, Upload } from 'lucide-react'
 import toast from 'react-hot-toast'
 
+const TYPES = ['plot', 'flat', 'villa', 'house']
+const FACING = ['East', 'West', 'North', 'South', 'NE', 'NW', 'SE', 'SW']
+const AMENITIES = ['24/7 Water', 'Power Backup', 'Security', 'Park', 'Gym', 'Swimming Pool', 'Club House', 'Parking']
+
 export default function ListProperty() {
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
