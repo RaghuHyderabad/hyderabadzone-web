@@ -4,7 +4,6 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { propertiesApi, locationsApi } from '../api/index'
 import { Loader2, Upload, Star, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
-import client from '../api/client'
 
 const TYPES     = ['plot', 'flat', 'villa', 'house']
 const FACING    = ['East', 'West', 'North', 'South', 'NE', 'NW', 'SE', 'SW']
@@ -67,11 +66,7 @@ export default function EditProperty() {
       // Upload new images if any
       if (newImages.length > 0) {
         try {
-          const formData = new FormData()
-          newImages.forEach(img => formData.append('images[]', img))
-          await client.post(`/api/properties/${id}/images`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-          })
+          await propertiesApi.uploadImages(id, newImages)
         } catch { toast.error('Some images failed to upload.') }
       }
       toast.success('Property updated successfully!')
@@ -80,15 +75,9 @@ export default function EditProperty() {
     onError: (err) => toast.error(err.response?.data?.message || 'Update failed.'),
   })
 
-  const setPrimaryImage = async (imageId) => {
-    try {
-      await client.post(`/api/properties/${id}/images/${imageId}/primary`)
-      setExistingImages(imgs => imgs.map(img => ({ ...img, is_primary: img.id === imageId })))
-      toast.success('Primary image updated!')
-    } catch {
-      // Silently handle if endpoint not available
-      setExistingImages(imgs => imgs.map(img => ({ ...img, is_primary: img.id === imageId })))
-    }
+  const setPrimaryImage = (imageId) => {
+    setExistingImages(imgs => imgs.map(img => ({ ...img, is_primary: img.id === imageId })))
+    toast.success('Primary image set! Save changes to apply.')
   }
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
