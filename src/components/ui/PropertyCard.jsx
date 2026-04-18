@@ -41,8 +41,11 @@ export default function PropertyCard({ property, compact = false }) {
           <img
             src={property.thumbnail}
             alt={property.title}
+            width="400"
+            height="300"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-300">
