@@ -40,6 +40,11 @@ export default function Navbar() {
                 <Link to="/dashboard" className="text-gray-600 hover:text-brand font-medium transition flex items-center gap-1.5">
                   <LayoutDashboard className="w-4 h-4" /> Dashboard
                 </Link>
+                {user?.role === 'admin' && (
+                  <Link to="/admin" className="text-brand hover:text-brand-light font-semibold transition text-sm border border-brand px-3 py-1.5 rounded-lg">
+                    Admin Panel
+                  </Link>
+                )}
                 <Link to="/list-property" className="btn-primary text-sm px-4 py-2 flex items-center gap-1.5">
                   <PlusCircle className="w-4 h-4" /> List Property
                 </Link>
