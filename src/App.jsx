@@ -3,6 +3,7 @@ import { Suspense, lazy } from 'react'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import useAuthStore from './store/authStore'
+import ScrollToTop from './components/ScrollToTop'
 
 const Home             = lazy(() => import('./pages/Home'))
 const Search           = lazy(() => import('./pages/Search'))
@@ -42,6 +43,7 @@ function PageLoader() {
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
+      <ScrollToTop />
       <Navbar />
       <main className="flex-1">
         <Suspense fallback={<PageLoader />}>
@@ -59,11 +61,9 @@ export default function App() {
             <Route path="/admin"              element={<AdminRoute><AdminDashboard /></AdminRoute>} />
             <Route path="/admin/listings"     element={<AdminRoute><ManageListings /></AdminRoute>} />
             <Route path="/admin/analytics"    element={<AdminRoute><Analytics /></AdminRoute>} />
-
             {/* SEO Location Routes - must be LAST */}
             <Route path="/:locationSlug"               element={<LocationPage />} />
             <Route path="/:locationSlug/:propertyType" element={<LocationTypePage />} />
-
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
