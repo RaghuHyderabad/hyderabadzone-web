@@ -2,18 +2,34 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { PlusCircle, Eye, TrendingUp, Clock, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
-import { userApi } from '../api/index'
+import { userApi, propertiesApi } from '../api/index'
 import { formatPrice } from '../utils/index'
 import toast from 'react-hot-toast'
 
 export default function Dashboard() {
   const queryClient = useQueryClient()
+
   const { data, isLoading } = useQuery({
     queryKey: ['dashboard'],
     queryFn:  userApi.dashboard,
   })
 
-  if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 text-brand animate-spin" /></div>
+  const markSold = async (id) => {
+    if (!window.confirm('Mark this property as SOLD? This cannot be undone.')) return
+    try {
+      await propertiesApi.markSold(id)
+      toast.success('Property marked as sold!')
+      queryClient.invalidateQueries(['dashboard'])
+    } catch (e) {
+      toast.error(e?.response?.data?.message || 'Failed. Please try again.')
+    }
+  }
+
+  if (isLoading) return (
+    <div className="flex justify-center py-20" style={{minHeight:'60vh'}}>
+      <Loader2 className="w-8 h-8 text-brand animate-spin" />
+    </div>
+  )
 
   const d = data || {}
 
@@ -77,11 +93,17 @@ export default function Dashboard() {
                     <td className="px-4 py-3 text-gray-600">{l.leads_count}</td>
                     <td className="px-4 py-3 text-xs text-gray-400">{l.expires_at || '—'}</td>
                     <td className="px-4 py-3">
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap">
                         <Link to={`/property/${l.slug}`} className="text-brand text-xs hover:underline">View</Link>
-                        {l.status !== 'sold' && <Link to={`/edit-property/${l.id}`} className="text-gray-500 text-xs hover:underline">Edit</Link>}
+                        {l.status !== 'sold' && (
+                          <Link to={`/edit-property/${l.id}`} className="text-gray-500 text-xs hover:underline">Edit</Link>
+                        )}
                         {l.status === 'active' && (
-                          <button onClick={() => markSold(l.id)} className="text-green-700 text-xs hover:underline font-medium">Sold</button>
+                          <button
+                            onClick={() => markSold(l.id)}
+                            className="text-blue-600 text-xs hover:underline font-medium">
+                            Mark Sold
+                          </button>
                         )}
                         {(l.status === 'expired' || l.status === 'active') && (
                           <Link to={`/payment/${l.id}`} className="text-orange-500 text-xs hover:underline">Renew</Link>
@@ -117,4 +139,3 @@ function StatusBadge({ status }) {
     </span>
   )
 }
-
