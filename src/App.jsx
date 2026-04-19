@@ -15,6 +15,7 @@ const Login            = lazy(() => import('./pages/Login'))
 const LocationPage     = lazy(() => import('./pages/LocationPage'))
 const LocationTypePage = lazy(() => import('./pages/LocationTypePage'))
 const AdminDashboard   = lazy(() => import('./pages/Admin/AdminDashboard'))
+const VerifyWhatsApp   = lazy(() => import('./pages/VerifyWhatsApp'))
 const ManageListings   = lazy(() => import('./pages/Admin/ManageListings'))
 const Analytics        = lazy(() => import('./pages/Admin/Analytics'))
 
@@ -54,6 +55,7 @@ export default function App() {
             <Route path="/edit-property/:id"  element={<ProtectedRoute><EditProperty /></ProtectedRoute>} />
             <Route path="/payment/:id"        element={<ProtectedRoute><Payment /></ProtectedRoute>} />
             <Route path="/dashboard"          element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/verify-whatsapp"    element={<VerifyWhatsApp />} />
             <Route path="/admin"              element={<AdminRoute><AdminDashboard /></AdminRoute>} />
             <Route path="/admin/listings"     element={<AdminRoute><ManageListings /></AdminRoute>} />
             <Route path="/admin/analytics"    element={<AdminRoute><Analytics /></AdminRoute>} />
