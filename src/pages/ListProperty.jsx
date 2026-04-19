@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { propertiesApi, locationsApi } from '../api/index'
-import { Loader2, Upload } from 'lucide-react'
+import { Loader2, Upload, MapPin } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const TYPES     = ['plot', 'flat', 'villa', 'house']
@@ -13,6 +13,7 @@ export default function ListProperty() {
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [images, setImages] = useState([])
+  const [mapInput, setMapInput] = useState('')
   const [form, setForm] = useState({
     title: '', type: 'flat', location_id: '', price: '', price_type: 'sqft',
     area: '', area_unit: 'sqft', bedrooms: '', bathrooms: '', description: '',
@@ -56,6 +57,27 @@ export default function ListProperty() {
     }))
   }
 
+  // Parse lat/lng from Google Maps link or direct coordinates
+  const parseMapLink = (input) => {
+    if (!input) return
+    const patterns = [
+      /[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/,
+      /@(-?\d+\.?\d*),(-?\d+\.?\d*)/,
+      /maps\/place\/[^/]+\/@(-?\d+\.?\d*),(-?\d+\.?\d*)/,
+      /^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/,
+    ]
+    for (const pattern of patterns) {
+      const match = input.match(pattern)
+      if (match) {
+        set('latitude', match[1])
+        set('longitude', match[2])
+        toast.success(`📍 Location set: ${match[1]}, ${match[2]}`)
+        return
+      }
+    }
+    toast.error('Could not read location. Try: 17.3850, 78.4867 or paste a Google Maps link.')
+  }
+
   const submit = () => {
     if (!form.title || !form.location_id || !form.price || !form.whatsapp_contact) {
       toast.error('Please fill all required fields.')
@@ -89,6 +111,7 @@ export default function ListProperty() {
       </div>
 
       <div className="card p-6 space-y-5">
+
         {/* ── STEP 1: Basic Info ── */}
         {step === 1 && (
           <>
@@ -224,6 +247,50 @@ export default function ListProperty() {
                 placeholder="https://www.youtube.com/watch?v=..." className="input-field" />
             </div>
 
+            {/* ── GOOGLE MAPS LOCATION ── */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block flex items-center gap-1">
+                <MapPin className="w-4 h-4 text-brand" />
+                Property Location on Map (optional but recommended)
+              </label>
+              <div className="flex gap-2">
+                <input
+                  value={mapInput}
+                  onChange={e => setMapInput(e.target.value)}
+                  placeholder="Paste Google Maps link or coordinates e.g. 17.3850, 78.4867"
+                  className="input-field flex-1 text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => parseMapLink(mapInput)}
+                  className="btn-outline text-sm px-4 whitespace-nowrap">
+                  Set 📍
+                </button>
+              </div>
+
+              {form.latitude && form.longitude ? (
+                <div className="mt-2 flex items-center gap-2 text-xs text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+                  <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                  ✅ Location set: {Number(form.latitude).toFixed(4)}, {Number(form.longitude).toFixed(4)}
+                  <button
+                    type="button"
+                    onClick={() => { set('latitude', ''); set('longitude', ''); setMapInput('') }}
+                    className="ml-auto text-red-400 hover:text-red-600 font-medium">
+                    ✕ Clear
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-2 bg-blue-50 rounded-lg px-3 py-2 text-xs text-blue-600 space-y-1">
+                  <p className="font-medium">📱 How to get your property location:</p>
+                  <p>1. Open <a href="https://maps.google.com" target="_blank" rel="noreferrer" className="underline font-medium">Google Maps</a> on your phone</p>
+                  <p>2. Long press on your property location</p>
+                  <p>3. Tap the coordinates shown at the top (e.g. 17.3850, 78.4867)</p>
+                  <p>4. Tap Share → Copy Link → paste here</p>
+                  <p className="text-blue-400">Or type coordinates directly: 17.3850, 78.4867</p>
+                </div>
+              )}
+            </div>
+
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">
                 Photos — up to 6 (first one = primary display image)
@@ -307,6 +374,7 @@ export default function ListProperty() {
                 <span>Location:</span><span>{allLocations.find(l => l.id == form.location_id)?.name || '—'}</span>
                 <span>Price:</span><span>₹{Number(form.price || 0).toLocaleString()} {form.price_type !== 'total' ? `/ ${form.price_type}` : ''}</span>
                 <span>Photos:</span><span>{images.length} selected</span>
+                <span>Map:</span><span>{form.latitude ? '✅ Set' : '—'}</span>
               </div>
             </div>
 
