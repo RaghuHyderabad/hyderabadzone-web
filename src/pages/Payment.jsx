@@ -37,8 +37,8 @@ export default function Payment() {
   const verifyMutation = useMutation({
     mutationFn: paymentsApi.verify,
     onSuccess: (res) => {
-      toast.success('Payment successful! Listing is now live.')
-      navigate('/dashboard')
+      toast.success('Payment successful!')
+      navigate(`/verify-whatsapp?property_id=${id}`)
     },
     onError: () => toast.error('Payment verification failed. Contact support.'),
   })

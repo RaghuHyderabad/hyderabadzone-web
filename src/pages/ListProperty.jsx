@@ -39,7 +39,7 @@ export default function ListProperty() {
         toast.success('Listing published successfully!')
         navigate('/dashboard')
       } else {
-        navigate(`/payment/${res.property.id}`)
+        navigate(`/verify-whatsapp?property_id=${res.property.id}`)
       }
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Failed to create listing.'),
