@@ -5,8 +5,8 @@ import { propertiesApi, locationsApi } from '../api/index'
 import { Loader2, Upload } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const TYPES = ['plot', 'flat', 'villa', 'house']
-const FACING = ['East', 'West', 'North', 'South', 'NE', 'NW', 'SE', 'SW']
+const TYPES     = ['plot', 'flat', 'villa', 'house']
+const FACING    = ['East', 'West', 'North', 'South', 'NE', 'NW', 'SE', 'SW']
 const AMENITIES = ['24/7 Water', 'Power Backup', 'Security', 'Park', 'Gym', 'Swimming Pool', 'Club House', 'Parking']
 
 export default function ListProperty() {
@@ -34,12 +34,14 @@ export default function ListProperty() {
           await propertiesApi.uploadImages(res.property.id, images)
         } catch { toast.error('Image upload failed. You can add them later.') }
       }
-      // Admin listings skip payment
+      // Admin listings skip payment and verification
       if (res.admin) {
         toast.success('Listing published successfully!')
         navigate('/dashboard')
       } else {
-        navigate(`/verify-whatsapp?property_id=${res.property.id}`)
+        // Regular users: go to payment first → then verify whatsapp after payment
+        toast.success('Property saved! Proceeding to payment...')
+        navigate(`/payment/${res.property.id}`)
       }
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Failed to create listing.'),
@@ -57,6 +59,10 @@ export default function ListProperty() {
   const submit = () => {
     if (!form.title || !form.location_id || !form.price || !form.whatsapp_contact) {
       toast.error('Please fill all required fields.')
+      return
+    }
+    if (!/^[6-9]\d{9}$/.test(form.whatsapp_contact)) {
+      toast.error('Enter a valid 10-digit WhatsApp number.')
       return
     }
     createMutation.mutate(form)
@@ -83,6 +89,7 @@ export default function ListProperty() {
       </div>
 
       <div className="card p-6 space-y-5">
+        {/* ── STEP 1: Basic Info ── */}
         {step === 1 && (
           <>
             <div>
@@ -169,6 +176,7 @@ export default function ListProperty() {
           </>
         )}
 
+        {/* ── STEP 2: Details ── */}
         {step === 2 && (
           <>
             <div>
@@ -217,12 +225,15 @@ export default function ListProperty() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Photos — up to 6 (first one = primary display image)</label>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">
+                Photos — up to 6 (first one = primary display image)
+              </label>
               <label className="border-2 border-dashed border-gray-200 rounded-xl p-6 flex flex-col items-center
                                justify-center cursor-pointer hover:border-brand transition">
                 <Upload className="w-8 h-8 text-gray-300 mb-2" />
                 <span className="text-sm text-gray-500">Click to upload photos</span>
-                <span className="text-xs text-gray-400 mt-1">JPG, PNG, WebP · Max 5MB · Up to 6 photos</span>
+                <span className="text-xs text-gray-400 mt-1">JPG, PNG, WebP · Max 5MB each · Up to 6 photos</span>
+                <span className="text-xs text-orange-500 mt-1">💡 Compress large photos free at tinypng.com</span>
                 <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden"
                   onChange={e => {
                     const files = Array.from(e.target.files)
@@ -276,6 +287,7 @@ export default function ListProperty() {
           </>
         )}
 
+        {/* ── STEP 3: Contact & Publish ── */}
         {step === 3 && (
           <>
             <div>
@@ -294,12 +306,20 @@ export default function ListProperty() {
                 <span>Type:</span><span className="capitalize">{form.type}</span>
                 <span>Location:</span><span>{allLocations.find(l => l.id == form.location_id)?.name || '—'}</span>
                 <span>Price:</span><span>₹{Number(form.price || 0).toLocaleString()} {form.price_type !== 'total' ? `/ ${form.price_type}` : ''}</span>
+                <span>Photos:</span><span>{images.length} selected</span>
               </div>
             </div>
 
+            {/* Payment info */}
             <div className="bg-orange-50 border border-orange-100 rounded-xl p-4">
-              <p className="text-sm font-semibold text-orange-700 mb-1">Listing Fee: ₹499</p>
-              <p className="text-xs text-orange-600">Your listing will go live for 30 days after payment and admin approval.</p>
+              <p className="text-sm font-semibold text-orange-700 mb-1">💳 Listing Fee: ₹499</p>
+              <p className="text-xs text-orange-600 mb-2">Your listing will go live for 30 days after payment and admin approval.</p>
+              <div className="text-xs text-gray-500 space-y-1">
+                <div>✅ Step 1: Submit property details (this form)</div>
+                <div>✅ Step 2: Pay ₹499 via Razorpay</div>
+                <div>✅ Step 3: Confirm via WhatsApp</div>
+                <div>✅ Step 4: Admin approves → listing goes live!</div>
+              </div>
             </div>
 
             <div className="flex gap-3">
@@ -307,7 +327,7 @@ export default function ListProperty() {
               <button onClick={submit} disabled={createMutation.isPending}
                 className="btn-primary flex-1 flex items-center justify-center gap-2">
                 {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                Save & Pay ₹499
+                Save & Proceed to Payment →
               </button>
             </div>
           </>
@@ -316,4 +336,3 @@ export default function ListProperty() {
     </div>
   )
 }
-
