@@ -34,7 +34,7 @@ export default function PropertyCard({ property, compact = false }) {
   }
 
   return (
-    <Link to={`/property/${property.slug}`} className="card block group">
+    <Link to={`/property/${property.slug}`} className={`card block group ${property.status === 'sold' ? 'opacity-85' : ''}`}>
       {/* Image */}
       <div className="relative overflow-hidden rounded-t-card aspect-[4/3] bg-gray-100">
         {property.thumbnail ? (
@@ -53,8 +53,17 @@ export default function PropertyCard({ property, compact = false }) {
           </div>
         )}
 
+        {/* SOLD overlay */}
+        {property.status === 'sold' && (
+          <div className="absolute inset-0 bg-gray-900/60 flex items-center justify-center z-10">
+            <div className="bg-red-600 text-white font-bold text-2xl px-8 py-3 rounded-2xl rotate-[-15deg] shadow-xl tracking-widest">
+              SOLD
+            </div>
+          </div>
+        )}
+
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex gap-1.5">
+        <div className="absolute top-3 left-3 flex gap-1.5 z-20">
           {property.is_featured && (
             <span className="badge-featured flex items-center gap-1">
               <Zap className="w-3 h-3" /> Featured
@@ -72,13 +81,13 @@ export default function PropertyCard({ property, compact = false }) {
           onClick={handleSave}
           disabled={saving}
           className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center
-                     hover:bg-white transition shadow-sm"
+                     hover:bg-white transition shadow-sm z-20"
         >
           <Heart className={`w-4 h-4 ${saved ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
         </button>
 
         {/* Type badge */}
-        <div className="absolute bottom-3 left-3">
+        <div className="absolute bottom-3 left-3 z-20">
           <span className="badge-type">{property.type}</span>
         </div>
       </div>
@@ -125,8 +134,15 @@ export default function PropertyCard({ property, compact = false }) {
           </span>
         </div>
 
-        {/* EMI hint */}
-        {!compact && totalPrice > 0 && (
+        {/* Sold badge in content */}
+        {property.status === 'sold' && (
+          <div className="text-xs bg-red-50 text-red-600 font-semibold px-3 py-1.5 rounded-lg border border-red-200">
+            🔴 This property has been sold
+          </div>
+        )}
+
+        {/* EMI hint - only for non-sold */}
+        {!compact && totalPrice > 0 && property.status !== 'sold' && (
           <div className="text-xs text-gray-400 border-t border-gray-50 pt-2">
             EMI from <span className="text-green-600 font-medium">{formatEMI(emi)}</span>
           </div>
