@@ -1,11 +1,13 @@
 // src/pages/Dashboard.jsx
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { PlusCircle, Eye, TrendingUp, Clock, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 import { userApi } from '../api/index'
 import { formatPrice } from '../utils/index'
+import toast from 'react-hot-toast'
 
 export default function Dashboard() {
+  const queryClient = useQueryClient()
   const { data, isLoading } = useQuery({
     queryKey: ['dashboard'],
     queryFn:  userApi.dashboard,
@@ -77,7 +79,10 @@ export default function Dashboard() {
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
                         <Link to={`/property/${l.slug}`} className="text-brand text-xs hover:underline">View</Link>
-                        <Link to={`/edit-property/${l.id}`} className="text-gray-500 text-xs hover:underline">Edit</Link>
+                        {l.status !== 'sold' && <Link to={`/edit-property/${l.id}`} className="text-gray-500 text-xs hover:underline">Edit</Link>}
+                        {l.status === 'active' && (
+                          <button onClick={() => markSold(l.id)} className="text-green-700 text-xs hover:underline font-medium">Sold</button>
+                        )}
                         {(l.status === 'expired' || l.status === 'active') && (
                           <Link to={`/payment/${l.id}`} className="text-orange-500 text-xs hover:underline">Renew</Link>
                         )}
@@ -100,6 +105,7 @@ export default function Dashboard() {
 function StatusBadge({ status }) {
   const map = {
     active:          'bg-green-100 text-green-700',
+    sold:            'bg-blue-100 text-blue-700',
     pending_payment: 'bg-yellow-100 text-yellow-700',
     draft:           'bg-gray-100 text-gray-600',
     expired:         'bg-red-100 text-red-600',
