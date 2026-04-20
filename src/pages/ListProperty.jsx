@@ -90,9 +90,15 @@ export default function ListProperty() {
     createMutation.mutate(form)
   }
 
-  const allLocations = locations?.data
-    ? Object.values(locations.data).flat()
-    : []
+  // Handle both grouped {zone: [...]} and flat array formats
+  const allLocations = (() => {
+    try {
+      if (!locations?.data) return []
+      const data = locations.data
+      if (Array.isArray(data)) return data
+      return Object.values(data).flat()
+    } catch { return [] }
+  })()
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
