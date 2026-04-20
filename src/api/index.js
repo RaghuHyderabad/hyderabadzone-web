@@ -1,16 +1,16 @@
 import client from './client'
 
 export const propertiesApi = {
-  list: (params) => client.get('/api/properties', { params }).then(r => r.data),
-  get:  (id)    => client.get(`/api/properties/${id}`).then(r => r.data),
-  featured: ()  => client.get('/api/properties/featured').then(r => r.data),
-  create: (data)      => client.post('/api/properties', data).then(r => r.data),
-  update: (id, data)  => client.put(`/api/properties/${id}`, data).then(r => r.data),
-  delete: (id)        => client.delete(`/api/properties/${id}`).then(r => r.data),
-  deleteImage:   (id, imageId) => client.delete(`/api/properties/${id}/images/${imageId}`).then(r => r.data),
+  list:          (params)       => client.get('/api/properties', { params }).then(r => r.data),
+  get:           (id)           => client.get(`/api/properties/${id}`).then(r => r.data),
+  featured:      ()             => client.get('/api/properties/featured').then(r => r.data),
+  create:        (data)         => client.post('/api/properties', data).then(r => r.data),
+  update:        (id, data)     => client.put(`/api/properties/${id}`, data).then(r => r.data),
+  delete:        (id)           => client.delete(`/api/properties/${id}`).then(r => r.data),
+  deleteImage:   (id, imageId)  => client.delete(`/api/properties/${id}/images/${imageId}`).then(r => r.data),
   markSold:      (id)           => client.post(`/api/properties/${id}/sold`).then(r => r.data),
   trackWhatsapp: (id)           => client.post(`/api/properties/${id}/whatsapp`).then(r => r.data),
-  uploadImages: (id, files) => {
+  uploadImages:  (id, files) => {
     const form = new FormData()
     files.forEach(f => form.append('images[]', f))
     return client.post(`/api/properties/${id}/images`, form, {
@@ -42,8 +42,9 @@ export const leadsApi = {
 }
 
 export const paymentsApi = {
-  createOrder: (propertyId) => client.post('/api/payments/order', { property_id: propertyId }).then(r => r.data),
-  verify:      (data)       => client.post('/api/payments/verify', data).then(r => r.data),
+  // Fixed: correct endpoint + passes type parameter
+  createOrder: (data) => client.post('/api/payments/create-order', data).then(r => r.data),
+  verify:      (data) => client.post('/api/payments/verify', data).then(r => r.data),
 }
 
 export const userApi = {
