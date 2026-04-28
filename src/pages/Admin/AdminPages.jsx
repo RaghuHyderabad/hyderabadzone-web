@@ -6,7 +6,7 @@ import { CheckCircle, XCircle, Zap, Search, Loader2 } from 'lucide-react'
 import { adminApi } from '../../api/index'
 import toast from 'react-hot-toast'
 
-const STATUS_OPTIONS = ['', 'active', 'pending_payment', 'expired', 'rejected', 'draft']
+const STATUS_OPTIONS = ['', 'pending', 'active', 'pending_payment', 'expired', 'rejected', 'draft', 'sold']
 
 export default function ManageListings() {
   const qc = useQueryClient()
@@ -45,6 +45,8 @@ export default function ManageListings() {
 
   const STATUS_COLORS = {
     active:          'bg-green-100 text-green-700',
+    pending:         'bg-orange-100 text-orange-700',
+    sold:            'bg-blue-100 text-blue-700',
     pending_payment: 'bg-yellow-100 text-yellow-700',
     draft:           'bg-gray-100 text-gray-600',
     expired:         'bg-red-100 text-red-600',
