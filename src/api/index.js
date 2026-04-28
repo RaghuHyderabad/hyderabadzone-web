@@ -63,4 +63,5 @@ export const adminApi = {
   approve:    (id)         => client.put(`/api/admin/properties/${id}/approve`).then(r => r.data),
   reject:     (id, reason) => client.put(`/api/admin/properties/${id}/reject`, { reason }).then(r => r.data),
   feature:    (id)         => client.put(`/api/admin/properties/${id}/feature`).then(r => r.data),
+  leads:      (params)     => client.get('/api/admin/leads', { params }).then(r => r.data),
 }
