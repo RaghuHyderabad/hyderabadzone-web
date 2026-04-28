@@ -35,6 +35,9 @@ export default function PropertyDetail() {
   const [emiRate, setEmiRate]         = useState(8.5)
   const [emiTenure, setEmiTenure]     = useState(20)
   const [saved, setSaved]             = useState(false)
+  const [waPopup, setWaPopup]         = useState(false)
+  const [waForm, setWaForm]           = useState({ name: '', phone: '' })
+  const [waLoading, setWaLoading]     = useState(false)
 
   const parts      = slugId?.split('-') ?? []
   const lastPart   = parts[parts.length - 1]
@@ -116,9 +119,23 @@ export default function PropertyDetail() {
     leadMutation.mutate({ property_id: p.id, ...leadForm, source: 'form' })
   }
 
-  const handleWA = () => {
-    userApi.submitLead({ property_id: p.id, name: 'WhatsApp', phone: '0000000000', source: 'whatsapp' }).catch(() => {})
-    propertiesApi.trackWhatsapp(p.id).catch(() => {})
+  const handleWaSubmit = async () => {
+    if (!waForm.name.trim()) { toast.error('Please enter your name.'); return }
+    if (!/^[6-9]\d{9}$/.test(waForm.phone)) { toast.error('Enter valid 10-digit phone number.'); return }
+    setWaLoading(true)
+    try {
+      await userApi.submitLead({
+        property_id: p.id,
+        name:        waForm.name,
+        phone:       waForm.phone,
+        source:      'whatsapp',
+        message:     'Contacted via WhatsApp',
+      })
+      await propertiesApi.trackWhatsapp(p.id).catch(() => {})
+    } catch { /* Silent */ } finally { setWaLoading(false) }
+    setWaPopup(false)
+    setWaForm({ name: '', phone: '' })
+    window.open(p.whatsapp_link, '_blank')
   }
 
   const handleShare = () => {
@@ -604,14 +621,53 @@ export default function PropertyDetail() {
         </div>
       </div>
 
+
+      {/* ── WHATSAPP LEAD POPUP ── */}
+      {waPopup && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4"
+          onClick={e => e.target === e.currentTarget && setWaPopup(false)}>
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl">
+            <div className="text-center mb-5">
+              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                {WA_ICON}
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Connect with Owner</h3>
+              <p className="text-sm text-gray-500 mt-1">Enter your details to continue</p>
+            </div>
+            <div className="space-y-3 mb-4">
+              <input type="text" placeholder="Your Name *"
+                value={waForm.name}
+                onChange={e => setWaForm(f => ({ ...f, name: e.target.value }))}
+                className="input-field" autoFocus />
+              <input type="tel" placeholder="Your Phone Number *" maxLength={10}
+                value={waForm.phone}
+                onChange={e => setWaForm(f => ({ ...f, phone: e.target.value.replace(/\D/g, '') }))}
+                className="input-field" />
+            </div>
+            <div className="bg-gray-50 rounded-xl p-3 mb-4 text-xs text-gray-500">
+              <p className="font-medium text-gray-700 truncate">{p.title}</p>
+              <p>{p.location?.name} · {p.formatted_price}</p>
+            </div>
+            <button onClick={handleWaSubmit} disabled={waLoading}
+              className="btn-wa w-full justify-center flex items-center gap-2 py-3.5 text-base mb-3">
+              {waLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : WA_ICON}
+              Open WhatsApp
+            </button>
+            <button onClick={() => setWaPopup(false)}
+              className="w-full text-sm text-gray-400 hover:text-gray-600 transition py-2">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
       {/* ── MOBILE STICKY WHATSAPP BUTTON ── */}
       {isActive && (
         <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden p-3 bg-white border-t border-gray-200 shadow-lg">
-          <a href={p.whatsapp_link} target="_blank" rel="noopener noreferrer"
-            onClick={handleWA}
+          <button
+            onClick={() => setWaPopup(true)}
             className="btn-wa w-full justify-center flex items-center gap-2 py-3.5 text-base">
             {WA_ICON} WhatsApp Owner — Free
-          </a>
+          </button>
         </div>
       )}
     </>
