@@ -152,10 +152,10 @@ export default function PropertyDetail() {
     toast.success(saved ? 'Removed from saved' : '❤️ Saved to favourites')
   }
 
-  const prevImg = () => setActiveImg(i => (i - 1 + p.images.length) % p.images.length)
-  const nextImg = () => setActiveImg(i => (i + 1) % p.images.length)
+  const prevImg = () => setActiveImg(i => (i - 1 + (p.images?.length || 1)) % (p.images?.length || 1))
+  const nextImg = () => setActiveImg(i => (i + 1) % (p.images?.length || 1))
 
-  const similar = (similarData?.data || []).filter(s => s.id !== p.id).slice(0, 3)
+  const similar = Array.isArray(similarData?.data) ? similarData.data.filter(s => s.id !== p.id).slice(0, 3) : []
 
   return (
     <>
