@@ -565,11 +565,11 @@ export default function PropertyDetail() {
                 /* ACTIVE — Contact options */
                 <>
                   {/* WhatsApp CTA */}
-                  <a href={p.whatsapp_link} target="_blank" rel="noopener noreferrer"
+                  <button
                     onClick={() => setWaPopup(true)}
                     className="btn-wa w-full justify-center mb-3 text-base py-3.5 flex items-center gap-2">
                     {WA_ICON} WhatsApp Owner
-                  </a>
+                  </button>
 
                   {/* Call button */}
                   <a href={`tel:+91${p.owner?.whatsapp_link?.match(/91(\d{10})/)?.[1] || ''}`}
