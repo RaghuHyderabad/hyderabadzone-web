@@ -19,6 +19,7 @@ const AdminDashboard   = lazy(() => import('./pages/Admin/AdminDashboard'))
 const VerifyWhatsApp   = lazy(() => import('./pages/VerifyWhatsApp'))
 const ManageListings   = lazy(() => import('./pages/Admin/ManageListings'))
 const Analytics        = lazy(() => import('./pages/Admin/Analytics'))
+const AdminLeads       = lazy(() => import('./pages/Admin/AdminLeads'))
 
 function ProtectedRoute({ children }) {
   const { token } = useAuthStore()
@@ -60,6 +61,7 @@ export default function App() {
             <Route path="/verify-whatsapp"    element={<VerifyWhatsApp />} />
             <Route path="/admin"              element={<AdminRoute><AdminDashboard /></AdminRoute>} />
             <Route path="/admin/listings"     element={<AdminRoute><ManageListings /></AdminRoute>} />
+            <Route path="/admin/leads"        element={<AdminRoute><AdminLeads /></AdminRoute>} />
             <Route path="/admin/analytics"    element={<AdminRoute><Analytics /></AdminRoute>} />
             {/* SEO Location Routes - must be LAST */}
             <Route path="/:locationSlug"               element={<LocationPage />} />
