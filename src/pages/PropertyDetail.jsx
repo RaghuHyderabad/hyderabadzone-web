@@ -566,7 +566,7 @@ export default function PropertyDetail() {
                 <>
                   {/* WhatsApp CTA */}
                   <a href={p.whatsapp_link} target="_blank" rel="noopener noreferrer"
-                    onClick={handleWA}
+                    onClick={() => setWaPopup(true)}
                     className="btn-wa w-full justify-center mb-3 text-base py-3.5 flex items-center gap-2">
                     {WA_ICON} WhatsApp Owner
                   </a>
