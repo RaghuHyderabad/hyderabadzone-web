@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams, Link } from 'react-router-dom'
 import { MapPin, TrendingUp, Loader2, ShieldCheck, Users, BadgeCheck } from 'lucide-react'
 import { locationsApi } from '../api/index'
-import SEO from '../components/SEO'
+import SEO, { buildLocationSEO } from '../components/SEO'
 import PropertyCard from '../components/ui/PropertyCard'
 
 const TYPES = [
@@ -62,15 +62,7 @@ export default function LocationPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8" style={{minHeight:"100vh"}}>
-      {loc && (
-        <SEO
-          title={`${loc.name} Properties for Sale | Plots, Villas & Flats`}
-          description={`Explore properties in ${loc.name}, Hyderabad. Find plots, villas, and flats with latest prices. Direct owner contact, zero brokerage.`}
-          canonical={`/${locationSlug}`}
-          schema={schema}
-          breadcrumbs={[{ name: 'Home', url: '/' }, { name: loc.name, url: `/${locationSlug}` }]}
-        />
-      )}
+      {loc && <SEO {...buildLocationSEO(loc, locationSlug)} schema={schema} />}
 
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
