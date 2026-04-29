@@ -12,7 +12,6 @@ import SEO from '../components/SEO'
 import PropertyCard from '../components/ui/PropertyCard'
 import toast from 'react-hot-toast'
 
-// Amenity icons map
 const AMENITY_ICONS = {
   'Parking':       <Car className="w-4 h-4" />,
   '24/7 Water':    <Droplets className="w-4 h-4" />,
@@ -35,9 +34,14 @@ export default function PropertyDetail() {
   const [emiRate, setEmiRate]         = useState(8.5)
   const [emiTenure, setEmiTenure]     = useState(20)
   const [saved, setSaved]             = useState(false)
+  // WhatsApp popup
   const [waPopup, setWaPopup]         = useState(false)
   const [waForm, setWaForm]           = useState({ name: '', phone: '' })
   const [waLoading, setWaLoading]     = useState(false)
+  // Call popup
+  const [callPopup, setCallPopup]     = useState(false)
+  const [callForm, setCallForm]       = useState({ name: '', phone: '' })
+  const [callLoading, setCallLoading] = useState(false)
 
   const parts      = slugId?.split('-') ?? []
   const lastPart   = parts[parts.length - 1]
@@ -48,7 +52,6 @@ export default function PropertyDetail() {
     queryFn:  () => propertiesApi.get(propertyId),
   })
 
-  // Fetch similar properties
   const { data: similarData } = useQuery({
     queryKey: ['similar', data?.data?.location?.id, data?.data?.type],
     queryFn:  () => propertiesApi.list({
@@ -108,17 +111,12 @@ export default function PropertyDetail() {
   }
 
   const handleLead = () => {
-    if (!leadForm.name || !leadForm.phone) {
-      toast.error('Name and phone are required.')
-      return
-    }
-    if (!/^[6-9]\d{9}$/.test(leadForm.phone)) {
-      toast.error('Enter a valid 10-digit phone number.')
-      return
-    }
+    if (!leadForm.name || !leadForm.phone) { toast.error('Name and phone are required.'); return }
+    if (!/^[6-9]\d{9}$/.test(leadForm.phone)) { toast.error('Enter a valid 10-digit phone number.'); return }
     leadMutation.mutate({ property_id: p.id, ...leadForm, source: 'form' })
   }
 
+  // ── WhatsApp popup submit ──────────────────────────────
   const handleWaSubmit = async () => {
     if (!waForm.name.trim()) { toast.error('Please enter your name.'); return }
     if (!/^[6-9]\d{9}$/.test(waForm.phone)) { toast.error('Enter valid 10-digit phone number.'); return }
@@ -136,6 +134,26 @@ export default function PropertyDetail() {
     setWaPopup(false)
     setWaForm({ name: '', phone: '' })
     window.open(p.whatsapp_link, '_blank')
+  }
+
+  // ── Call popup submit ──────────────────────────────────
+  const handleCallSubmit = async () => {
+    if (!callForm.name.trim()) { toast.error('Please enter your name.'); return }
+    if (!/^[6-9]\d{9}$/.test(callForm.phone)) { toast.error('Enter valid 10-digit phone number.'); return }
+    setCallLoading(true)
+    try {
+      await userApi.submitLead({
+        property_id: p.id,
+        name:        callForm.name,
+        phone:       callForm.phone,
+        source:      'call',
+        message:     'Requested call with owner',
+      })
+    } catch { /* Silent */ } finally { setCallLoading(false) }
+    const ownerPhone = p.whatsapp_link?.match(/91(\d{10})/)?.[1] || ''
+    setCallPopup(false)
+    setCallForm({ name: '', phone: '' })
+    window.location.href = `tel:+91${ownerPhone}`
   }
 
   const handleShare = () => {
@@ -232,24 +250,17 @@ export default function PropertyDetail() {
                 onClick={() => p.images?.length > 0 && setFullscreen(true)}>
                 {p.images?.length > 0 ? (
                   <img src={p.images[activeImg]?.url} alt={p.title}
-                    className="w-full h-full object-cover"
-                    loading="eager" />
+                    className="w-full h-full object-cover" loading="eager" />
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-300">
                     <Maximize2 className="w-16 h-16" />
                   </div>
                 )}
-
-                {/* SOLD stamp on image */}
                 {isSold && (
                   <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center">
-                    <div className="bg-red-600 text-white font-bold text-4xl px-10 py-4 rounded-2xl rotate-[-15deg] shadow-xl tracking-widest">
-                      SOLD
-                    </div>
+                    <div className="bg-red-600 text-white font-bold text-4xl px-10 py-4 rounded-2xl rotate-[-15deg] shadow-xl tracking-widest">SOLD</div>
                   </div>
                 )}
-
-                {/* Nav arrows */}
                 {p.images?.length > 1 && (
                   <>
                     <button onClick={e => { e.stopPropagation(); prevImg() }}
@@ -262,22 +273,16 @@ export default function PropertyDetail() {
                     </button>
                   </>
                 )}
-
-                {/* Badges */}
                 <div className="absolute top-4 left-4 flex gap-2 z-10">
                   {p.is_featured && <span className="badge-featured flex items-center gap-1"><Zap className="w-3 h-3" /> Featured</span>}
                   {p.is_verified && <span className="badge-verified flex items-center gap-1"><BadgeCheck className="w-3 h-3" /> Verified</span>}
                 </div>
-
-                {/* Image count */}
                 {p.images?.length > 1 && (
                   <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs px-3 py-1 rounded-full z-10">
                     {activeImg + 1} / {p.images.length} · Tap to expand
                   </div>
                 )}
               </div>
-
-              {/* Thumbnails */}
               {p.images?.length > 1 && (
                 <div className="flex gap-2 p-3 overflow-x-auto">
                   {p.images.map((img, i) => (
@@ -300,7 +305,6 @@ export default function PropertyDetail() {
                     <MapPin className="w-4 h-4 flex-shrink-0 text-brand" />
                     <span>{p.location?.name}, Hyderabad · {p.location?.zone}</span>
                   </div>
-                  {/* Quick specs chips */}
                   <div className="flex flex-wrap gap-2">
                     <span className="badge-type">{p.type}</span>
                     {p.bedrooms && (
@@ -325,8 +329,6 @@ export default function PropertyDetail() {
                     )}
                   </div>
                 </div>
-
-                {/* Price */}
                 <div className="text-right flex-shrink-0">
                   <div className="text-3xl font-bold text-brand">
                     {formatPrice(p.price, p.price_type, p.area)}
@@ -343,8 +345,6 @@ export default function PropertyDetail() {
                   )}
                 </div>
               </div>
-
-              {/* Stats row */}
               <div className="flex items-center gap-4 text-xs text-gray-400 pt-3 border-t border-gray-100">
                 <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> {p.views} views</span>
                 {p.whatsapp_clicks > 0 && (
@@ -370,12 +370,10 @@ export default function PropertyDetail() {
                   <PlayCircle className="w-5 h-5 text-red-500" /> Property Video
                 </h3>
                 <div className="aspect-video rounded-xl overflow-hidden">
-                  <iframe
-                    src={p.youtube_url.replace('watch?v=', 'embed/')}
+                  <iframe src={p.youtube_url.replace('watch?v=', 'embed/')}
                     className="w-full h-full"
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen loading="lazy"
-                  />
+                    allowFullScreen loading="lazy" />
                 </div>
               </div>
             )}
@@ -396,10 +394,7 @@ export default function PropertyDetail() {
                   {p.amenities.map(a => (
                     <div key={a} className="flex items-center gap-2 bg-green-50 rounded-xl px-3 py-2.5">
                       <span className="text-green-600">
-                        {typeof AMENITY_ICONS[a] === 'string'
-                          ? AMENITY_ICONS[a]
-                          : (AMENITY_ICONS[a] || <CheckCircle2 className="w-4 h-4" />)
-                        }
+                        {typeof AMENITY_ICONS[a] === 'string' ? AMENITY_ICONS[a] : (AMENITY_ICONS[a] || <CheckCircle2 className="w-4 h-4" />)}
                       </span>
                       <span className="text-sm text-gray-700 font-medium">{a}</span>
                     </div>
@@ -448,13 +443,8 @@ export default function PropertyDetail() {
                 <div className="p-4 border-b border-gray-100">
                   <h2 className="font-bold text-gray-900 text-lg">📍 Location on Map</h2>
                 </div>
-                <iframe
-                  title="Property Location"
-                  width="100%"
-                  height="300"
-                  loading="lazy"
-                  src={`https://maps.google.com/maps?q=${p.latitude},${p.longitude}&z=15&output=embed`}
-                />
+                <iframe title="Property Location" width="100%" height="300" loading="lazy"
+                  src={`https://maps.google.com/maps?q=${p.latitude},${p.longitude}&z=15&output=embed`} />
                 <div className="p-3">
                   <a href={`https://maps.google.com/?q=${p.latitude},${p.longitude}`}
                     target="_blank" rel="noreferrer"
@@ -508,13 +498,8 @@ export default function PropertyDetail() {
             {similar.length > 0 && (
               <div className="card p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-bold text-gray-900 text-lg">
-                    Similar {p.type}s in {p.location?.name}
-                  </h2>
-                  <Link to={`/${p.location?.slug}/${p.type}s`}
-                    className="text-brand text-sm hover:underline">
-                    View All →
-                  </Link>
+                  <h2 className="font-bold text-gray-900 text-lg">Similar {p.type}s in {p.location?.name}</h2>
+                  <Link to={`/${p.location?.slug}/${p.type}s`} className="text-brand text-sm hover:underline">View All →</Link>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {similar.map(s => <PropertyCard key={s.id} property={s} compact />)}
@@ -526,8 +511,6 @@ export default function PropertyDetail() {
           {/* ── RIGHT: CONTACT SIDEBAR ── */}
           <div className="space-y-4">
             <div className="card p-5 sticky top-20">
-
-              {/* Owner info */}
               <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
                 <div className="w-10 h-10 bg-brand rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                   {p.owner?.name?.[0]?.toUpperCase() || 'O'}
@@ -545,7 +528,6 @@ export default function PropertyDetail() {
                 </div>
               </div>
 
-              {/* SOLD / EXPIRED state */}
               {(isSold || isExpired) ? (
                 <div className="text-center">
                   <div className={`${isSold ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'} border rounded-xl p-4 mb-4`}>
@@ -556,26 +538,23 @@ export default function PropertyDetail() {
                       This property is no longer available
                     </p>
                   </div>
-                  <Link to={`/${p.location?.slug}`}
-                    className="btn-brand w-full justify-center flex items-center gap-2">
+                  <Link to={`/${p.location?.slug}`} className="btn-brand w-full justify-center flex items-center gap-2">
                     View Similar in {p.location?.name}
                   </Link>
                 </div>
               ) : (
-                /* ACTIVE — Contact options */
                 <>
-                  {/* WhatsApp CTA */}
-                  <button
-                    onClick={() => setWaPopup(true)}
+                  {/* ✅ WhatsApp button → popup */}
+                  <button onClick={() => setWaPopup(true)}
                     className="btn-wa w-full justify-center mb-3 text-base py-3.5 flex items-center gap-2">
                     {WA_ICON} WhatsApp Owner
                   </button>
 
-                  {/* Call button */}
-                  <a href={`tel:+91${p.owner?.whatsapp_link?.match(/91(\d{10})/)?.[1] || ''}`}
+                  {/* ✅ Call button → popup (saves lead) */}
+                  <button onClick={() => setCallPopup(true)}
                     className="w-full flex items-center justify-center gap-2 border-2 border-brand text-brand font-semibold py-3 rounded-xl hover:bg-brand hover:text-white transition mb-4">
                     <Phone className="w-4 h-4" /> Call Owner
-                  </a>
+                  </button>
 
                   {/* Enquiry form */}
                   <div className="border-t border-gray-100 pt-4 space-y-3">
@@ -591,9 +570,7 @@ export default function PropertyDetail() {
                       className="input-field py-2.5 text-sm resize-none" rows={2} />
                     <button onClick={handleLead} disabled={leadMutation.isPending}
                       className="btn-brand w-full flex items-center justify-center gap-2 py-2.5 text-sm">
-                      {leadMutation.isPending
-                        ? <Loader2 className="w-4 h-4 animate-spin" />
-                        : <MessageSquare className="w-4 h-4" />}
+                      {leadMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageSquare className="w-4 h-4" />}
                       Send Enquiry
                     </button>
                   </div>
@@ -610,10 +587,7 @@ export default function PropertyDetail() {
                       <CheckCircle2 className="w-3.5 h-3.5 text-green-500" /> Admin verified listing
                     </div>
                   </div>
-
-                  <p className="text-xs text-gray-400 text-center mt-3">
-                    Expires: {p.expires_at}
-                  </p>
+                  <p className="text-xs text-gray-400 text-center mt-3">Expires: {p.expires_at}</p>
                 </>
               )}
             </div>
@@ -621,6 +595,44 @@ export default function PropertyDetail() {
         </div>
       </div>
 
+      {/* ── CALL LEAD POPUP ── */}
+      {callPopup && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4"
+          onClick={e => e.target === e.currentTarget && setCallPopup(false)}>
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl">
+            <div className="text-center mb-5">
+              <div className="w-14 h-14 bg-brand/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Phone className="w-7 h-7 text-brand" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Call Owner</h3>
+              <p className="text-sm text-gray-500 mt-1">Enter your details to connect</p>
+            </div>
+            <div className="space-y-3 mb-4">
+              <input type="text" placeholder="Your Name *"
+                value={callForm.name}
+                onChange={e => setCallForm(f => ({ ...f, name: e.target.value }))}
+                className="input-field" autoFocus />
+              <input type="tel" placeholder="Your Phone Number *" maxLength={10}
+                value={callForm.phone}
+                onChange={e => setCallForm(f => ({ ...f, phone: e.target.value.replace(/\D/g, '') }))}
+                className="input-field" />
+            </div>
+            <div className="bg-gray-50 rounded-xl p-3 mb-4 text-xs text-gray-500">
+              <p className="font-medium text-gray-700 truncate">{p.title}</p>
+              <p>{p.location?.name} · {p.formatted_price}</p>
+            </div>
+            <button onClick={handleCallSubmit} disabled={callLoading}
+              className="w-full flex items-center justify-center gap-2 border-2 border-brand text-brand font-semibold py-3.5 rounded-xl hover:bg-brand hover:text-white transition mb-3">
+              {callLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Phone className="w-5 h-5" />}
+              Call Owner Now
+            </button>
+            <button onClick={() => setCallPopup(false)}
+              className="w-full text-sm text-gray-400 hover:text-gray-600 transition py-2">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── WHATSAPP LEAD POPUP ── */}
       {waPopup && (
@@ -660,11 +672,11 @@ export default function PropertyDetail() {
           </div>
         </div>
       )}
+
       {/* ── MOBILE STICKY WHATSAPP BUTTON ── */}
       {isActive && (
         <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden p-3 bg-white border-t border-gray-200 shadow-lg">
-          <button
-            onClick={() => setWaPopup(true)}
+          <button onClick={() => setWaPopup(true)}
             className="btn-wa w-full justify-center flex items-center gap-2 py-3.5 text-base">
             {WA_ICON} WhatsApp Owner — Free
           </button>
