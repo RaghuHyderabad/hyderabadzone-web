@@ -42,7 +42,6 @@ export const leadsApi = {
 }
 
 export const paymentsApi = {
-  // Fixed: correct endpoint + passes type parameter
   createOrder: (data) => client.post('/api/payments/create-order', data).then(r => r.data),
   verify:      (data) => client.post('/api/payments/verify', data).then(r => r.data),
 }
@@ -62,6 +61,7 @@ export const adminApi = {
   properties: (params)     => client.get('/api/admin/properties', { params }).then(r => r.data),
   approve:    (id)         => client.put(`/api/admin/properties/${id}/approve`).then(r => r.data),
   reject:     (id, reason) => client.put(`/api/admin/properties/${id}/reject`, { reason }).then(r => r.data),
-  feature:    (id)         => client.put(`/api/admin/properties/${id}/feature`).then(r => r.data),
+  // Fixed: correct endpoint /toggle-featured (was /feature)
+  feature:    (id)         => client.put(`/api/admin/properties/${id}/toggle-featured`).then(r => r.data),
   leads:      (params)     => client.get('/api/admin/leads', { params }).then(r => r.data),
 }
