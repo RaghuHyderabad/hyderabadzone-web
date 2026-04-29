@@ -2,10 +2,12 @@ User-agent: *
 Allow: /
 
 Disallow: /search
+Disallow: /filter
 Disallow: /dashboard
 Disallow: /admin
-Disallow: /payment
 Disallow: /login
+Disallow: /payment
+Disallow: /verify-whatsapp
 Disallow: /edit-property
 
 Sitemap: https://www.hyderabadzone.com/sitemap.xml
