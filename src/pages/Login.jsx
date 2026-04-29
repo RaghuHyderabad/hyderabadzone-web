@@ -1,18 +1,20 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Phone, ShieldCheck, Loader2 } from 'lucide-react'
+import { Phone, ShieldCheck, Loader2, Lock } from 'lucide-react'
 import { authApi } from '../api/index'
 import useAuthStore from '../store/authStore'
 import toast from 'react-hot-toast'
 
 export default function Login() {
-  const [step, setStep]       = useState(1)
-  const [phone, setPhone]     = useState('')
-  const [otp, setOtp]         = useState('')
-  const [name, setName]       = useState('')
-  const [loading, setLoading] = useState(false)
+  const [step, setStep]           = useState(1)
+  const [phone, setPhone]         = useState('')
+  const [otp, setOtp]             = useState('')
+  const [name, setName]           = useState('')
+  const [password, setPassword]   = useState('')
+  const [isAdmin, setIsAdmin]     = useState(false)
+  const [loading, setLoading]     = useState(false)
   const [resending, setResending] = useState(false)
-  const [timer, setTimer]     = useState(0)
+  const [timer, setTimer]         = useState(0)
   const { setAuth } = useAuthStore()
   const navigate = useNavigate()
 
@@ -33,10 +35,23 @@ export default function Login() {
     }
     setLoading(true)
     try {
-      await authApi.sendOtp(phone)
-      toast.success('OTP sent to +91-' + phone)
+      const res = await authApi.sendOtp(phone)
+
+      // Admin account — show password field
+      if (res.is_admin) {
+        setIsAdmin(true)
+        setStep(2)
+        toast('🛡️ Admin account detected — enter your password', {
+          icon: '🔐', duration: 4000,
+        })
+        return
+      }
+
+      // Regular user — OTP sent
+      setIsAdmin(false)
       setStep(2)
       startTimer()
+      toast.success('OTP sent to +91-' + phone)
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to send OTP.')
     } finally { setLoading(false) }
@@ -56,15 +71,24 @@ export default function Login() {
   }
 
   const verifyOtp = async () => {
-    if (otp.length !== 6) { toast.error('Enter the 6-digit OTP.'); return }
+    if (isAdmin) {
+      if (!password.trim()) { toast.error('Enter your admin password.'); return }
+    } else {
+      if (otp.length !== 6) { toast.error('Enter the 6-digit OTP.'); return }
+    }
     setLoading(true)
     try {
-      const res = await authApi.verifyOtp({ phone, code: otp, name: name || undefined })
+      const res = await authApi.verifyOtp({
+        phone,
+        code:     isAdmin ? password : otp,
+        password: isAdmin ? password : undefined,
+        name:     name || undefined,
+      })
       setAuth(res.token, res.user)
-      toast.success('Welcome to HyderabadZone!')
-      navigate('/dashboard')
+      toast.success(isAdmin ? '👑 Admin logged in!' : 'Welcome to HyderabadZone!')
+      navigate(res.user?.role === 'admin' ? '/admin' : '/dashboard')
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Invalid OTP.')
+      toast.error(err.response?.data?.message || 'Invalid credentials.')
     } finally { setLoading(false) }
   }
 
@@ -76,11 +100,14 @@ export default function Login() {
           <p className="text-gray-500 text-sm mt-1">
             {step === 1
               ? 'Enter your mobile number to continue'
-              : `OTP sent to +91-${phone}`}
+              : isAdmin
+                ? '🛡️ Admin Login — Enter your password'
+                : `OTP sent to +91-${phone}`}
           </p>
         </div>
 
-        {step === 1 ? (
+        {/* ── STEP 1: Phone Number ── */}
+        {step === 1 && (
           <div className="space-y-4">
             <div className="relative">
               <Phone className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
@@ -102,10 +129,43 @@ export default function Login() {
               onClick={sendOtp} disabled={loading}
               className="btn-brand w-full flex items-center justify-center gap-2">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              Send OTP
+              Continue
             </button>
           </div>
-        ) : (
+        )}
+
+        {/* ── STEP 2 (ADMIN): Password ── */}
+        {step === 2 && isAdmin && (
+          <div className="space-y-4">
+            <div className="bg-brand/5 border border-brand/20 rounded-xl p-3 text-center text-sm text-brand">
+              🛡️ Admin: +91-{phone}
+            </div>
+            <div className="relative">
+              <Lock className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
+              <input
+                type="password" value={password}
+                onChange={e => setPassword(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && verifyOtp()}
+                placeholder="Admin password"
+                className="input-field pl-10"
+                autoFocus />
+            </div>
+            <button
+              onClick={verifyOtp} disabled={loading}
+              className="btn-brand w-full flex items-center justify-center gap-2">
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              Login as Admin
+            </button>
+            <button
+              onClick={() => { setStep(1); setPassword(''); setIsAdmin(false) }}
+              className="w-full text-sm text-gray-400 hover:text-brand transition">
+              ← Change number
+            </button>
+          </div>
+        )}
+
+        {/* ── STEP 2 (USER): OTP ── */}
+        {step === 2 && !isAdmin && (
           <div className="space-y-4">
             <div className="relative">
               <ShieldCheck className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
@@ -142,7 +202,7 @@ export default function Login() {
             </div>
 
             <button
-              onClick={() => { setStep(1); setOtp(''); setTimer(0) }}
+              onClick={() => { setStep(1); setOtp(''); setTimer(0); setIsAdmin(false) }}
               className="w-full text-sm text-gray-400 hover:text-brand transition">
               ← Change number
             </button>
