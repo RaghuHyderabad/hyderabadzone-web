@@ -8,7 +8,7 @@ import { MapPin, Eye, BadgeCheck, Zap, BedDouble, Maximize2,
 import { useState } from 'react'
 import { propertiesApi, userApi } from '../api/index'
 import { formatPrice, formatUnitPrice, calcEMI, formatEMI } from '../utils/index'
-import SEO from '../components/SEO'
+import SEO, { buildPropertySEO } from '../components/SEO'
 import PropertyCard from '../components/ui/PropertyCard'
 import toast from 'react-hot-toast'
 
@@ -89,27 +89,6 @@ export default function PropertyDetail() {
     : Number(p.price) * Number(p.area)
   const emi = calcEMI(totalPrice, emiRate, emiTenure)
 
-  const seoTitle = p.area
-    ? `${p.area}${p.area_unit} ${p.type} in ${p.location?.name} | ${p.formatted_price}`
-    : `${p.type} in ${p.location?.name} | ${p.formatted_price}`
-
-  const propertySchema = {
-    '@context': 'https://schema.org',
-    '@type':    'RealEstateListing',
-    name:        p.title,
-    description: p.description || p.title,
-    url:         `https://www.hyderabadzone.com/property/${p.slug}`,
-    image:        p.thumbnail || '',
-    offers:      { '@type': 'Offer', price: p.price, priceCurrency: 'INR' },
-    address: {
-      '@type':          'PostalAddress',
-      addressLocality:  p.location?.name,
-      addressRegion:    'Telangana',
-      addressCountry:   'IN',
-    },
-    seller: { '@type': 'Person', name: p.owner?.name },
-  }
-
   const handleLead = () => {
     if (!leadForm.name || !leadForm.phone) { toast.error('Name and phone are required.'); return }
     if (!/^[6-9]\d{9}$/.test(leadForm.phone)) { toast.error('Enter a valid 10-digit phone number.'); return }
@@ -177,19 +156,7 @@ export default function PropertyDetail() {
 
   return (
     <>
-      <SEO
-        title={seoTitle}
-        description={`Buy ${p.type} in ${p.location?.name}, Hyderabad for ${p.formatted_price}. ${p.area ? p.area + p.area_unit + '. ' : ''}Contact owner directly. Zero brokerage.`}
-        canonical={`/property/${p.slug}`}
-        image={p.thumbnail}
-        noindex={isExpired}
-        schema={propertySchema}
-        breadcrumbs={[
-          { name: 'Home', url: '/' },
-          { name: p.location?.name, url: `/${p.location?.slug}` },
-          { name: p.title, url: `/property/${p.slug}` },
-        ]}
-      />
+      <SEO {...buildPropertySEO(p)} />
 
       {/* ── FULLSCREEN IMAGE VIEWER ── */}
       {fullscreen && p.images?.length > 0 && (
