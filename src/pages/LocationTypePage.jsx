@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams, Link } from 'react-router-dom'
-import { MapPin, TrendingUp, Loader2, ArrowRight } from 'lucide-react'
+import { MapPin, TrendingUp, Loader2, ShieldCheck, Users, BadgeCheck } from 'lucide-react'
 import { propertiesApi, locationsApi } from '../api/index'
 import PropertyCard from '../components/ui/PropertyCard'
 import SEO from '../components/SEO'
@@ -19,12 +19,27 @@ const TYPE_LABELS = {
   'independent-houses':  'Independent Houses',
 }
 
+const TrustBadge = () => (
+  <div className="inline-flex flex-wrap items-center gap-x-4 gap-y-2 bg-green-50 border border-green-200 rounded-2xl px-4 py-2.5 mt-3">
+    <span className="flex items-center gap-1.5 text-green-700 text-sm font-medium">
+      <Users className="w-4 h-4" /> Direct Owner Contact
+    </span>
+    <span className="text-green-300 hidden sm:inline">|</span>
+    <span className="flex items-center gap-1.5 text-green-700 text-sm font-medium">
+      <ShieldCheck className="w-4 h-4" /> Zero Brokerage
+    </span>
+    <span className="text-green-300 hidden sm:inline">|</span>
+    <span className="flex items-center gap-1.5 text-green-700 text-sm font-medium">
+      <BadgeCheck className="w-4 h-4" /> Admin Verified Listings
+    </span>
+  </div>
+)
+
 export default function LocationTypePage() {
   const { locationSlug, propertyType } = useParams()
-
   const dbType = TYPE_MAP[propertyType]
 
-  const { data: locData, isLoading: locLoading } = useQuery({
+  const { data: locData } = useQuery({
     queryKey: ['location', locationSlug],
     queryFn:  () => locationsApi.get(locationSlug),
   })
@@ -44,9 +59,10 @@ export default function LocationTypePage() {
     </div>
   )
 
-  const loc = locData?.location
+  const loc        = locData?.location
   const properties = propsData?.data ?? []
-  const typeLabel = TYPE_LABELS[propertyType]
+  const typeLabel  = TYPE_LABELS[propertyType]
+  const total      = propsData?.pagination?.total ?? properties.length
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8" style={{minHeight:"100vh"}}>
@@ -60,6 +76,7 @@ export default function LocationTypePage() {
           { name: typeLabel, url: `/${locationSlug}/${propertyType}` },
         ]}
       />
+
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
         <Link to="/" className="hover:text-brand">Home</Link>
@@ -69,7 +86,7 @@ export default function LocationTypePage() {
         <span className="text-gray-700 font-medium">{typeLabel}</span>
       </div>
 
-      {/* Header */}
+      {/* Hero Header */}
       <div className="mb-8">
         {loc && (
           <div className="flex items-center gap-2 mb-2">
@@ -82,16 +99,18 @@ export default function LocationTypePage() {
             )}
           </div>
         )}
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-bold text-gray-900 mb-1">
           {typeLabel} in {loc?.name ?? locationSlug}, Hyderabad
         </h1>
-        <p className="text-gray-500">
-          Buy verified {typeLabel.toLowerCase()} in {loc?.name ?? locationSlug}.
-          Direct owner contact · Zero brokerage · Admin verified.
+        <p className="text-gray-500 text-sm">
+          Buy verified {typeLabel.toLowerCase()} in {loc?.name ?? locationSlug} — direct from owners.
         </p>
+
+        {/* ✅ Trust Badge */}
+        <TrustBadge />
       </div>
 
-      {/* Other type links */}
+      {/* Property Type Filter Pills */}
       <div className="flex flex-wrap gap-2 mb-8">
         {Object.entries(TYPE_LABELS).map(([slug, label]) => (
           <Link key={slug} to={`/${locationSlug}/${slug}`}
@@ -112,15 +131,22 @@ export default function LocationTypePage() {
       ) : properties.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <div className="text-4xl mb-3">🏘️</div>
-          <p className="font-medium">No {typeLabel.toLowerCase()} listed in {loc?.name} yet.</p>
-          <p className="text-sm mt-1">Check back soon or browse other areas.</p>
-          <Link to={`/${locationSlug}`} className="btn-outline mt-4 inline-block">
-            ← Back to {loc?.name}
-          </Link>
+          <p className="font-medium text-gray-700">No {typeLabel.toLowerCase()} listed in {loc?.name} yet.</p>
+          <p className="text-sm mt-1 mb-5">Check back soon or browse other areas.</p>
+          <TrustBadge />
+          <div className="mt-6">
+            <Link to={`/${locationSlug}`} className="btn-outline">
+              ← Back to {loc?.name}
+            </Link>
+          </div>
         </div>
       ) : (
         <>
-          <p className="text-sm text-gray-500 mb-4">{propsData?.pagination?.total ?? properties.length} properties found</p>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm text-gray-500">
+              <span className="font-semibold text-gray-800">{total}</span> {typeLabel.toLowerCase()} found in {loc?.name}
+            </p>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {properties.map(p => <PropertyCard key={p.id} property={p} />)}
           </div>
