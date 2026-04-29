@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams, Link } from 'react-router-dom'
-import { MapPin, TrendingUp, Loader2 } from 'lucide-react'
+import { MapPin, TrendingUp, Loader2, ShieldCheck, Users, BadgeCheck } from 'lucide-react'
 import { locationsApi } from '../api/index'
 import SEO from '../components/SEO'
 import PropertyCard from '../components/ui/PropertyCard'
@@ -11,6 +11,22 @@ const TYPES = [
   { label: 'Villas',             type: 'villas',             icon: '🏡', desc: 'Luxury independent villas' },
   { label: 'Independent Houses', type: 'independent-houses', icon: '🏠', desc: 'Individual houses & plots' },
 ]
+
+const TrustBadge = () => (
+  <div className="inline-flex flex-wrap items-center gap-x-4 gap-y-2 bg-green-50 border border-green-200 rounded-2xl px-4 py-2.5 mt-3">
+    <span className="flex items-center gap-1.5 text-green-700 text-sm font-medium">
+      <Users className="w-4 h-4" /> Direct Owner Contact
+    </span>
+    <span className="text-green-300 hidden sm:inline">|</span>
+    <span className="flex items-center gap-1.5 text-green-700 text-sm font-medium">
+      <ShieldCheck className="w-4 h-4" /> Zero Brokerage
+    </span>
+    <span className="text-green-300 hidden sm:inline">|</span>
+    <span className="flex items-center gap-1.5 text-green-700 text-sm font-medium">
+      <BadgeCheck className="w-4 h-4" /> Admin Verified Listings
+    </span>
+  </div>
+)
 
 export default function LocationPage() {
   const { locationSlug } = useParams()
@@ -55,12 +71,15 @@ export default function LocationPage() {
           breadcrumbs={[{ name: 'Home', url: '/' }, { name: loc.name, url: `/${locationSlug}` }]}
         />
       )}
+
+      {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
         <Link to="/" className="hover:text-brand">Home</Link>
         <span>/</span>
         <span className="text-gray-700 font-medium">{loc.name}</span>
       </div>
 
+      {/* Hero Header */}
       <div className="mb-10">
         <div className="flex items-center gap-2 mb-2">
           <MapPin className="w-5 h-5 text-brand" />
@@ -71,15 +90,18 @@ export default function LocationPage() {
             </span>
           )}
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">
+        <h1 className="text-3xl font-bold text-gray-900 mb-1">
           Properties in {loc.name}, Hyderabad
         </h1>
-        <p className="text-gray-500 max-w-2xl">
+        <p className="text-gray-500 max-w-2xl text-sm">
           Browse verified plots, flats, villas and independent houses in {loc.name}.
-          Direct owner contact · Zero brokerage · Admin verified listings.
         </p>
+
+        {/* ✅ Trust Badge */}
+        <TrustBadge />
       </div>
 
+      {/* Property Type Cards */}
       <h2 className="text-xl font-semibold text-gray-800 mb-4">What are you looking for?</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
         {TYPES.map(t => (
@@ -92,15 +114,20 @@ export default function LocationPage() {
         ))}
       </div>
 
+      {/* All Properties */}
       {data?.properties?.data?.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">All Properties in {loc.name}</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-800">All Properties in {loc.name}</h2>
+            <span className="text-sm text-gray-400">{data.properties.data.length} listings</span>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {data.properties.data.map(p => <PropertyCard key={p.id} property={p} />)}
           </div>
         </div>
       )}
 
+      {/* About Section */}
       <div className="mt-12 bg-surface rounded-2xl p-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-3">About {loc.name}, Hyderabad</h2>
         <p className="text-gray-500 text-sm leading-relaxed">
