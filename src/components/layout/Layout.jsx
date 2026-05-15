@@ -128,7 +128,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-blue-800 text-center py-4 text-blue-300 text-sm">
-        © {new Date().getFullYear()} HyderabadZone. All rights reserved.
+        © {new Date().getFullYear()} HyderabadZone. All rights reserved. Marketed by <a href="https://raghuvardhanreddy.com/" target="_blank">Digital Marketing Consultant in Hyderabad</a>
       </div>
     </footer>
   )
