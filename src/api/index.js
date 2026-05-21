@@ -31,7 +31,8 @@ export const locationsApi = {
 }
 
 export const authApi = {
-  sendOtp:   (phone)  => client.post('/api/auth/send-otp', { phone }).then(r => r.data),
+  // email-based OTP (previously phone-based SMS)
+  sendOtp:   (email)  => client.post('/api/auth/send-otp', { email }).then(r => r.data),
   verifyOtp: (data)   => client.post('/api/auth/verify-otp', data).then(r => r.data),
   me:        ()       => client.get('/api/auth/me').then(r => r.data),
   logout:    ()       => client.post('/api/auth/logout').then(r => r.data),
@@ -41,9 +42,9 @@ export const leadsApi = {
   submit: (data) => client.post('/api/leads', data).then(r => r.data),
 }
 
+// Listings are FREE — no Razorpay, direct publish
 export const paymentsApi = {
-  createOrder: (data) => client.post('/api/payments/create-order', data).then(r => r.data),
-  verify:      (data) => client.post('/api/payments/verify', data).then(r => r.data),
+  publishFree: (data) => client.post('/api/payments/publish-free', data).then(r => r.data),
 }
 
 export const userApi = {
@@ -61,7 +62,6 @@ export const adminApi = {
   properties: (params)     => client.get('/api/admin/properties', { params }).then(r => r.data),
   approve:    (id)         => client.put(`/api/admin/properties/${id}/approve`).then(r => r.data),
   reject:     (id, reason) => client.put(`/api/admin/properties/${id}/reject`, { reason }).then(r => r.data),
-  // Fixed: correct endpoint /toggle-featured (was /feature)
   feature:    (id)         => client.put(`/api/admin/properties/${id}/toggle-featured`).then(r => r.data),
   leads:      (params)     => client.get('/api/admin/leads', { params }).then(r => r.data),
 }
