@@ -141,7 +141,19 @@ export default function Home() {
         </section>
       )}
 
-      {/* ─── RECENT LISTINGS ─── */}
+
+      {/* ─── ADSENSE — HOME MIDDLE ─── */}
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <ins className="adsbygoogle"
+          style={{display:'block'}}
+          data-ad-client="ca-pub-6849862116057516"
+          data-ad-slot="6790888213"
+          data-ad-format="auto"
+          data-full-width-responsive="true" />
+        <script dangerouslySetInnerHTML={{__html: '(adsbygoogle = window.adsbygoogle || []).push({});'}} />
+      </div>
+
+      {/* ─── RECENT LISTINGS ─── */
       {recent?.data?.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 pb-12">
           <div className="flex items-center justify-between mb-6">
