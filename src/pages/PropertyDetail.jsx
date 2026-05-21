@@ -52,6 +52,11 @@ export default function PropertyDetail() {
     queryFn:  () => propertiesApi.get(propertyId),
   })
 
+  // Push AdSense ad
+  useEffect(() => {
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}) } catch(e) {}
+  }, [])
+
   const { data: similarData } = useQuery({
     queryKey: ['similar', data?.data?.location?.id, data?.data?.type],
     queryFn:  () => propertiesApi.list({
@@ -361,7 +366,6 @@ export default function PropertyDetail() {
               data-ad-slot="4612967346"
               data-ad-format="auto"
               data-full-width-responsive="true" />
-            <script dangerouslySetInnerHTML={{__html: '(adsbygoogle = window.adsbygoogle || []).push({});'}} />
 
             {/* AMENITIES */}
             {p.amenities?.length > 0 && (
