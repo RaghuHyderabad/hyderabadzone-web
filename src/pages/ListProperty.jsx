@@ -40,8 +40,8 @@ export default function ListProperty() {
         toast.success('Listing published successfully!')
         navigate('/dashboard')
       } else {
-        // Regular users: go to payment first → then verify whatsapp after payment
-        toast.success('Property saved! Proceeding to payment...')
+        // Regular users: go to free publish confirmation
+        toast.success('Property saved! Submit to publish...')
         navigate(`/payment/${res.property.id}`)
       }
     },
@@ -103,7 +103,7 @@ export default function ListProperty() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">List Your Property</h1>
-      <p className="text-gray-500 mb-8">Fill in the details below. Pay ₹499 to publish.</p>
+      <p className="text-gray-500 mb-8">Fill in the details below. Listing is completely free!</p>
 
       {/* Steps */}
       <div className="flex gap-4 mb-8">
@@ -384,15 +384,13 @@ export default function ListProperty() {
               </div>
             </div>
 
-            {/* Payment info */}
-            <div className="bg-orange-50 border border-orange-100 rounded-xl p-4">
-              <p className="text-sm font-semibold text-orange-700 mb-1">💳 Listing Fee: ₹499</p>
-              <p className="text-xs text-orange-600 mb-2">Your listing will go live for 30 days after payment and admin approval.</p>
-              <div className="text-xs text-gray-500 space-y-1">
+            {/* Free listing info */}
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+              <p className="text-sm font-semibold text-green-700 mb-1">🎉 Listing is 100% FREE until June 30, 2027</p>
+              <div className="text-xs text-gray-500 space-y-1 mt-2">
                 <div>✅ Step 1: Submit property details (this form)</div>
-                <div>✅ Step 2: Pay ₹499 via Razorpay</div>
-                <div>✅ Step 3: Confirm via WhatsApp</div>
-                <div>✅ Step 4: Admin approves → listing goes live!</div>
+                <div>✅ Step 2: Confirm via WhatsApp</div>
+                <div>✅ Step 3: Admin approves → listing goes live!</div>
               </div>
             </div>
 
@@ -401,7 +399,7 @@ export default function ListProperty() {
               <button onClick={submit} disabled={createMutation.isPending}
                 className="btn-primary flex-1 flex items-center justify-center gap-2">
                 {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                Save & Proceed to Payment →
+                Submit Listing for Free →
               </button>
             </div>
           </>
