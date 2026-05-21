@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Mail, ShieldCheck, Loader2, Lock } from 'lucide-react'
+import { Mail, Phone, User, ShieldCheck, Loader2, Lock } from 'lucide-react'
 import { authApi } from '../api/index'
 import useAuthStore from '../store/authStore'
 import toast from 'react-hot-toast'
 
 export default function Login() {
   const [step, setStep]           = useState(1)
+  const [name, setName]           = useState('')
+  const [phone, setPhone]         = useState('')
   const [email, setEmail]         = useState('')
   const [otp, setOtp]             = useState('')
   const [password, setPassword]   = useState('')
@@ -30,10 +32,10 @@ export default function Login() {
   const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
 
   const sendOtp = async () => {
-    if (!isValidEmail(email)) {
-      toast.error('Enter a valid email address.')
-      return
-    }
+    if (!name.trim()) { toast.error('Enter your full name.'); return }
+    if (!/^[6-9]\d{9}$/.test(phone)) { toast.error('Enter a valid 10-digit mobile number.'); return }
+    if (!isValidEmail(email)) { toast.error('Enter a valid email address.'); return }
+
     setLoading(true)
     try {
       const res = await authApi.sendOtp(email)
@@ -75,6 +77,8 @@ export default function Login() {
     try {
       const res = await authApi.verifyOtp({
         email,
+        name:     name || undefined,
+        phone:    phone || undefined,
         code:     isAdmin ? password : otp,
         password: isAdmin ? password : undefined,
       })
@@ -93,16 +97,40 @@ export default function Login() {
           <Link to="/" className="font-bold text-2xl text-brand">HyderabadZone</Link>
           <p className="text-gray-500 text-sm mt-1">
             {step === 1
-              ? 'Enter your email to sign in or sign up'
+              ? 'Create account or sign in'
               : isAdmin
                 ? '🛡️ Admin Login — Enter your password'
                 : `OTP sent to ${email}`}
           </p>
         </div>
 
-        {/* ── STEP 1: Email only ── */}
+        {/* ── STEP 1: Name + Phone + Email ── */}
         {step === 1 && (
-          <div className="space-y-4">
+          <div className="space-y-3">
+            <div className="relative">
+              <User className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && sendOtp()}
+                placeholder="Full name"
+                className="input-field pl-10"
+                autoFocus
+              />
+            </div>
+            <div className="relative">
+              <Phone className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
+              <input
+                type="tel"
+                maxLength={10}
+                value={phone}
+                onChange={e => setPhone(e.target.value.replace(/\D/g, ''))}
+                onKeyDown={e => e.key === 'Enter' && sendOtp()}
+                placeholder="10-digit mobile number"
+                className="input-field pl-10"
+              />
+            </div>
             <div className="relative">
               <Mail className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
               <input
@@ -112,7 +140,6 @@ export default function Login() {
                 onKeyDown={e => e.key === 'Enter' && sendOtp()}
                 placeholder="your@email.com"
                 className="input-field pl-10"
-                autoFocus
               />
             </div>
             <button
@@ -120,7 +147,7 @@ export default function Login() {
               disabled={loading}
               className="btn-brand w-full flex items-center justify-center gap-2">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              Send OTP
+              Send OTP to Email
             </button>
           </div>
         )}
@@ -153,7 +180,7 @@ export default function Login() {
             <button
               onClick={() => { setStep(1); setPassword(''); setIsAdmin(false) }}
               className="w-full text-sm text-gray-400 hover:text-brand transition">
-              ← Change email
+              ← Go back
             </button>
           </div>
         )}
@@ -162,7 +189,7 @@ export default function Login() {
         {step === 2 && !isAdmin && (
           <div className="space-y-4">
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center text-sm text-blue-700">
-              📧 Check your inbox at <strong>{email}</strong>
+              📧 OTP sent to <strong>{email}</strong>
             </div>
             <div className="relative">
               <ShieldCheck className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
@@ -182,7 +209,7 @@ export default function Login() {
               disabled={loading}
               className="btn-brand w-full flex items-center justify-center gap-2">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              Verify & Login
+              Verify & Continue
             </button>
             <div className="text-center">
               {timer > 0 ? (
@@ -202,7 +229,7 @@ export default function Login() {
             <button
               onClick={() => { setStep(1); setOtp(''); setTimer(0); setIsAdmin(false) }}
               className="w-full text-sm text-gray-400 hover:text-brand transition">
-              ← Change email
+              ← Go back
             </button>
           </div>
         )}
