@@ -5,7 +5,7 @@ import { MapPin, Eye, BadgeCheck, Zap, BedDouble, Maximize2,
          MessageSquare, Phone, PlayCircle, Loader2, Heart,
          Share2, ChevronLeft, ChevronRight, X, CheckCircle2,
          Droplets, Car, Shield, Wifi, Trees, Zap as Power } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { propertiesApi, userApi } from '../api/index'
 import { formatPrice, formatUnitPrice, calcEMI, formatEMI } from '../utils/index'
 import SEO, { buildPropertySEO } from '../components/SEO'
@@ -43,6 +43,11 @@ export default function PropertyDetail() {
   const [callForm, setCallForm]       = useState({ name: '', phone: '' })
   const [callLoading, setCallLoading] = useState(false)
 
+  // Push AdSense ad
+  useEffect(() => {
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}) } catch(e) {}
+  }, [])
+
   const parts      = slugId?.split('-') ?? []
   const lastPart   = parts[parts.length - 1]
   const propertyId = /^\d+$/.test(lastPart) ? lastPart : slugId
@@ -51,11 +56,6 @@ export default function PropertyDetail() {
     queryKey: ['property', propertyId],
     queryFn:  () => propertiesApi.get(propertyId),
   })
-
-  // Push AdSense ad
-  useEffect(() => {
-    try { (window.adsbygoogle = window.adsbygoogle || []).push({}) } catch(e) {}
-  }, [])
 
   const { data: similarData } = useQuery({
     queryKey: ['similar', data?.data?.location?.id, data?.data?.type],
@@ -357,7 +357,6 @@ export default function PropertyDetail() {
                 <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">{p.description}</p>
               </div>
             )}
-
 
             {/* ─── ADSENSE — PROPERTY DETAIL ─── */}
             <ins className="adsbygoogle"
