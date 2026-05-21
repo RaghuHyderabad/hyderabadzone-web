@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowRight, TrendingUp, MapPin, Shield, Zap, Phone } from 'lucide-react'
 import SearchBar from '../components/search/SearchBar'
@@ -25,6 +25,11 @@ const BUDGET_CHIPS = [
 export default function Home() {
   const navigate = useNavigate()
   const [visibleRows, setVisibleRows] = useState(4)
+
+  // Push AdSense ad
+  useEffect(() => {
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}) } catch(e) {}
+  }, [])
 
   const { data: featured } = useQuery({
     queryKey: ['featured-properties'],
@@ -150,7 +155,6 @@ export default function Home() {
           data-ad-slot="6790888213"
           data-ad-format="auto"
           data-full-width-responsive="true" />
-        <script dangerouslySetInnerHTML={{__html: '(adsbygoogle = window.adsbygoogle || []).push({});'}} />
       </div>
 
       {/* ─── RECENT LISTINGS ─── */
