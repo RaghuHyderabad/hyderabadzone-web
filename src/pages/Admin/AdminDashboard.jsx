@@ -15,8 +15,8 @@ export default function AdminDashboard() {
   })
 
   const { data: pending, isLoading } = useQuery({
-    queryKey: ['admin-properties', 'pending_payment'],
-    queryFn:  () => adminApi.properties({ status: 'pending_payment' }),
+    queryKey: ['admin-properties', 'pending'],
+    queryFn:  () => adminApi.properties({ status: 'pending' }),
   })
 
   const approveMutation = useMutation({
