@@ -59,6 +59,7 @@ export const userApi = {
 
 export const adminApi = {
   stats:      ()           => client.get('/api/admin/stats').then(r => r.data),
+  analytics:  ()           => client.get('/api/admin/analytics').then(r => r.data),
   properties: (params)     => client.get('/api/admin/properties', { params }).then(r => r.data),
   approve:    (id)         => client.put(`/api/admin/properties/${id}/approve`).then(r => r.data),
   reject:     (id, reason) => client.put(`/api/admin/properties/${id}/reject`, { reason }).then(r => r.data),
