@@ -243,9 +243,9 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 pb-16">
         <div className="bg-cta-gradient rounded-3xl p-8 md:p-12 text-white text-center"
              style={{ backgroundImage: 'linear-gradient(135deg, #FF7A18, #FF4E00)' }}>
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">List Your Property for ₹499</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-3">List Your Property for FREE 🎉</h2>
           <p className="text-orange-100 mb-6 max-w-lg mx-auto">
-            Get 30 days of exposure · Direct WhatsApp leads · Admin verified listing
+            Free until June 30, 2027 · Direct WhatsApp leads · Admin verified listing
           </p>
           <Link to="/list-property" className="inline-flex items-center gap-2 bg-white text-cta-start
                                                font-bold px-8 py-3 rounded-xl hover:shadow-lg transition">
