@@ -353,6 +353,16 @@ export default function PropertyDetail() {
               </div>
             )}
 
+
+            {/* ─── ADSENSE — PROPERTY DETAIL ─── */}
+            <ins className="adsbygoogle"
+              style={{display:'block'}}
+              data-ad-client="ca-pub-6849862116057516"
+              data-ad-slot="4612967346"
+              data-ad-format="auto"
+              data-full-width-responsive="true" />
+            <script dangerouslySetInnerHTML={{__html: '(adsbygoogle = window.adsbygoogle || []).push({});'}} />
+
             {/* AMENITIES */}
             {p.amenities?.length > 0 && (
               <div className="card p-6">
