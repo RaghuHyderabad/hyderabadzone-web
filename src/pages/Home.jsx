@@ -157,7 +157,7 @@ export default function Home() {
           data-full-width-responsive="true" />
       </div>
 
-      {/* ─── RECENT LISTINGS ─── */
+      {/* ─── RECENT LISTINGS ─── */}
       {recent?.data?.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 pb-12">
           <div className="flex items-center justify-between mb-6">
